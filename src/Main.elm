@@ -4,9 +4,15 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 
+
 type alias Model =
-    { mail : String
+    { base : String
+    , host : String
     }
+
+
+type alias AddressValues =
+    ( String, String )
 
 
 type Msg
@@ -15,7 +21,8 @@ type Msg
 
 initialModel : Model
 initialModel =
-    { mail = ""
+    { base = ""
+    , host = "gmail.com"
     }
 
 
@@ -28,16 +35,11 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Input value ->
-            ( { model | mail = value }, Cmd.none )
-
-
-view : Model -> Html Msg
-view model =
-    div []
-        [ h1 [] [ text "Mail generator" ]
-        , mailInput model
-        , p [] [ text model.mail ]
-        ]
+            let
+                ( base, host ) =
+                    splitAddress value
+            in
+                ( { model | base = base, host = host }, Cmd.none )
 
 
 main : Program Never Model Msg
@@ -50,6 +52,48 @@ main =
         }
 
 
+view : Model -> Html Msg
+view model =
+    div []
+        [ h1 [] [ text "Mail generator" ]
+        , mailInput model
+        , span [] [ text model.host ]
+        , p [] [ text (combineAddress ( model.base, model.host )) ]
+        ]
+
+
 mailInput : Model -> Html Msg
 mailInput model =
-    input [ placeholder "Mail address", onInput Input ] []
+    input
+        [ placeholder "Mail address"
+        , onInput Input
+        ]
+        []
+
+
+address : String -> String
+address value =
+    value
+        |> splitAddress
+        |> combineAddress
+
+
+splitAddress : String -> AddressValues
+splitAddress address =
+    case String.split "@" address of
+        [ base, "" ] ->
+            ( base, initialModel.host )
+
+        [ base ] ->
+            ( base, initialModel.host )
+
+        [ base, domain ] ->
+            ( base, domain )
+
+        _ ->
+            ( "", initialModel.host )
+
+
+combineAddress : AddressValues -> String
+combineAddress ( base, host ) =
+    base ++ "@" ++ host
