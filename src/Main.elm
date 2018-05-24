@@ -3,16 +3,13 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Email
 
 
 type alias Model =
     { base : String
     , host : String
     }
-
-
-type alias AddressValues =
-    ( String, String )
 
 
 type Msg
@@ -22,7 +19,7 @@ type Msg
 initialModel : Model
 initialModel =
     { base = ""
-    , host = "gmail.com"
+    , host = Email.initialHost
     }
 
 
@@ -37,7 +34,7 @@ update msg model =
         Input value ->
             let
                 ( base, host ) =
-                    splitAddress value
+                    Email.splitAddress value
             in
                 ( { model | base = base, host = host }, Cmd.none )
 
@@ -58,7 +55,7 @@ view model =
         [ h1 [] [ text "Mail generator" ]
         , mailInput model
         , span [] [ text model.host ]
-        , p [] [ text (combineAddress ( model.base, model.host )) ]
+        , p [] [ text (Email.combineAddress ( model.base, model.host )) ]
         ]
 
 
@@ -69,31 +66,3 @@ mailInput model =
         , onInput Input
         ]
         []
-
-
-address : String -> String
-address value =
-    value
-        |> splitAddress
-        |> combineAddress
-
-
-splitAddress : String -> AddressValues
-splitAddress address =
-    case String.split "@" address of
-        [ base, "" ] ->
-            ( base, initialModel.host )
-
-        [ base ] ->
-            ( base, initialModel.host )
-
-        [ base, domain ] ->
-            ( base, domain )
-
-        _ ->
-            ( "", initialModel.host )
-
-
-combineAddress : AddressValues -> String
-combineAddress ( base, host ) =
-    base ++ "@" ++ host
