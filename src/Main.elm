@@ -9,17 +9,22 @@ import Email
 type alias Model =
     { base : String
     , host : String
+    , emails : List String
     }
 
 
 type Msg
     = Input String
+    | GenerateMail
+    | ClearEmailsList
+    | RemoveEmail String
 
 
 initialModel : Model
 initialModel =
     { base = ""
     , host = Email.initialHost
+    , emails = []
     }
 
 
@@ -38,6 +43,15 @@ update msg model =
             in
                 ( { model | base = base, host = host }, Cmd.none )
 
+        GenerateMail ->
+            ( { model | emails = List.append model.emails [ (Email.combineAddress ( (model.base ++ "+test"), model.host )) ] }, Cmd.none )
+
+        ClearEmailsList ->
+            ( { model | emails = [] }, Cmd.none )
+
+        RemoveEmail droppedEmail ->
+            ( { model | emails = List.filter (\email -> email /= droppedEmail) model.emails }, Cmd.none )
+
 
 main : Program Never Model Msg
 main =
@@ -53,9 +67,8 @@ view : Model -> Html Msg
 view model =
     div []
         [ h1 [] [ text "Mail generator" ]
-        , mailInput model
-        , span [] [ text model.host ]
-        , p [] [ text (Email.combineAddress ( model.base, model.host )) ]
+        , mailForm model
+        , mailsList model.emails
         ]
 
 
@@ -66,3 +79,37 @@ mailInput model =
         , onInput Input
         ]
         []
+
+
+mailsList : List String -> Html Msg
+mailsList emails =
+    div []
+        [ ul [] (mailItems emails)
+        , if List.isEmpty emails then
+            text ""
+          else
+            button [ type_ "button", onClick ClearEmailsList ] [ text "Clear" ]
+        ]
+
+
+mailItems : List String -> List (Html Msg)
+mailItems emails =
+    List.map mailItem emails
+
+
+mailItem : String -> Html Msg
+mailItem email =
+    li []
+        [ text email
+        , button [ onClick (RemoveEmail email) ] [ text "Remove" ]
+        ]
+
+
+mailForm : Model -> Html Msg
+mailForm model =
+    Html.form
+        [ onSubmit GenerateMail ]
+        [ mailInput model
+        , span [] [ text model.host ]
+        , button [] [ text "Generate" ]
+        ]
