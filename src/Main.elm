@@ -84,7 +84,7 @@ mailInput model =
 mailsList : List String -> Html Msg
 mailsList emails =
     div []
-        [ ul [] (mailItems emails)
+        [ ul [] (List.reverse (mailItems emails))
         , if List.isEmpty emails then
             text ""
           else
