@@ -41,10 +41,10 @@ combineAddress userName host =
 generateEmail : String -> String -> List String -> String
 generateEmail userName host emails =
     let
-        sameBases =
-            List.filter (\address -> String.contains userName address && String.contains host address) emails
-
         count =
-            (List.length sameBases) + 1
+            emails
+                |> List.filter (\address -> String.contains userName address && String.contains host address)
+                |> List.length
+                |> (+) 1
     in
         combineAddress (userName ++ "+" ++ (toString count)) host
