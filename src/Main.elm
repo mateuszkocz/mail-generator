@@ -7,7 +7,7 @@ import Email
 
 
 type alias Model =
-    { base : String
+    { userName : String
     , host : String
     , emails : List String
     }
@@ -22,7 +22,7 @@ type Msg
 
 initialModel : Model
 initialModel =
-    { base = ""
+    { userName = ""
     , host = Email.initialHost
     , emails = []
     }
@@ -38,13 +38,13 @@ update msg model =
     case msg of
         Input value ->
             let
-                ( base, host ) =
+                ( userName, host ) =
                     Email.splitAddress value
             in
-                ( { model | base = base, host = host }, Cmd.none )
+                ( { model | userName = userName, host = host }, Cmd.none )
 
         GenerateMail ->
-            ( { model | emails = List.append model.emails [ (Email.combineAddress ( (model.base ++ "+test"), model.host )) ] }, Cmd.none )
+            ( { model | emails = List.append model.emails [ Email.generateEmail model.userName model.host model.emails ] }, Cmd.none )
 
         ClearEmailsList ->
             ( { model | emails = [] }, Cmd.none )
