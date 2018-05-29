@@ -1,0 +1,12 @@
+<!doctype html>
+<body>
+    <div></div>
+    <script src="build/elm.js"></script>
+    <script>
+        const app = Elm.Main.embed(document.querySelector("div"))
+
+        app.ports.read.subscribe(() => {
+            app.ports.receivedReadResult.send("wololo")
+        })
+    </script>
+</body>

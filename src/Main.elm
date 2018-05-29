@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Email
+import Ports
 
 
 type alias Model =
@@ -18,6 +19,8 @@ type Msg
     | GenerateMail
     | ClearEmailsList
     | RemoveEmail String
+    | Read
+    | ReceivedStoredValue String
 
 
 initialModel : Model
@@ -52,6 +55,17 @@ update msg model =
         RemoveEmail droppedEmail ->
             ( { model | emails = List.filter (\email -> email /= droppedEmail) model.emails }, Cmd.none )
 
+        Read ->
+            ( model, Ports.read () )
+
+        ReceivedStoredValue value ->
+            ( model, Cmd.none )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Ports.receivedReadResult ReceivedStoredValue
+
 
 main : Program Never Model Msg
 main =
@@ -59,7 +73,7 @@ main =
         { init = init
         , view = view
         , update = update
-        , subscriptions = \model -> Sub.none
+        , subscriptions = subscriptions
         }
 
 
@@ -69,6 +83,7 @@ view model =
         [ h1 [] [ text "Mail generator" ]
         , mailForm model
         , mailsList model.emails
+        , button [ onClick Read ] [ text "Load values" ]
         ]
 
 
