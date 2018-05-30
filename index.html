@@ -1,12 +1,50 @@
 <!doctype html>
+
 <body>
     <div></div>
     <script src="build/elm.js"></script>
     <script>
         const app = Elm.Main.embed(document.querySelector("div"))
+        const {ports} = app
 
-        app.ports.read.subscribe(() => {
-            app.ports.receivedReadResult.send("wololo")
+        function getEmails() {
+            try {
+                return JSON.parse(localStorage.getItem('emails'))
+            } catch (error) {
+                // TODO: Should inform Elm?
+                return []
+            }
+        }
+
+        function storeEmails(emails) {
+            try {
+                localStorage.setItem('emails', JSON.stringify(emails))
+            } catch(error) {
+                console.log(error)
+                // TODO: Should inform Elm?
+            }
+        }
+
+        if (!localStorage.getItem('emails')) {
+            storeEmails([])
+        }
+
+        ports.store.subscribe(email => {
+            const emails = getEmails()
+            emails.push(email)
+            storeEmails(emails)
+        })
+
+        ports.removeEmail.subscribe(droppedEmail => {
+            storeEmails(getEmails().filter(email => email !== droppedEmail))
+        })
+
+        ports.removeAllEmails.subscribe(() => {
+            storeEmails([])
+        })
+
+        ports.getEmails.subscribe(() => {
+            ports.receiveEmails.send(getEmails())
         })
     </script>
 </body>

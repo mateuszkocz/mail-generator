@@ -19,8 +19,7 @@ type Msg
     | GenerateMail
     | ClearEmailsList
     | RemoveEmail String
-    | Read
-    | ReceivedStoredValue String
+    | ReceivedEmails (List String)
 
 
 initialModel : Model
@@ -33,7 +32,7 @@ initialModel =
 
 init : ( Model, Cmd Msg )
 init =
-    ( initialModel, Cmd.none )
+    ( initialModel, Ports.getEmails () )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -47,24 +46,25 @@ update msg model =
                 ( { model | userName = userName, host = host }, Cmd.none )
 
         GenerateMail ->
-            ( { model | emails = List.append model.emails [ Email.generateEmail model.userName model.host model.emails ] }, Cmd.none )
+            let
+                email =
+                    Email.generateEmail model.userName model.host model.emails
+            in
+                ( { model | emails = List.append model.emails [ email ] }, Ports.store email )
 
         ClearEmailsList ->
-            ( { model | emails = [] }, Cmd.none )
+            ( { model | emails = [] }, Ports.removeAllEmails () )
 
         RemoveEmail droppedEmail ->
-            ( { model | emails = List.filter (\email -> email /= droppedEmail) model.emails }, Cmd.none )
+            ( { model | emails = List.filter (\email -> email /= droppedEmail) model.emails }, Ports.removeEmail droppedEmail )
 
-        Read ->
-            ( model, Ports.read () )
-
-        ReceivedStoredValue value ->
-            ( model, Cmd.none )
+        ReceivedEmails emails ->
+            ( { model | emails = List.concat [ model.emails, emails ] }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Ports.receivedReadResult ReceivedStoredValue
+    Sub.batch [ Ports.receiveEmails ReceivedEmails ]
 
 
 main : Program Never Model Msg
@@ -83,7 +83,6 @@ view model =
         [ h1 [] [ text "Mail generator" ]
         , mailForm model
         , mailsList model.emails
-        , button [ onClick Read ] [ text "Load values" ]
         ]
 
 
@@ -110,6 +109,10 @@ mailsList emails =
 mailItems : List String -> List (Html Msg)
 mailItems emails =
     List.map mailItem emails
+
+
+
+-- TODO: allow generating "another email like that", ie. generate with the same appendix like the clicked one with increased counter.
 
 
 mailItem : String -> Html Msg
