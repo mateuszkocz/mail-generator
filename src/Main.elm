@@ -130,23 +130,34 @@ mailForm model =
     Html.form
         [ onSubmit GenerateMail ]
         [ mailInput model
-        , hostAddition model.host model.at
+        , hostAddition model
         , button [] [ text "Generate" ]
         ]
 
 
-hostAddition : String -> Bool -> Html Msg
-hostAddition host at =
-    if host == Email.initialHost then
-        span []
-            [ text
-                ((if at then
-                    ""
-                  else
-                    "@"
-                 )
-                    ++ host
-                )
+hostAddition : Model -> Html Msg
+hostAddition { userName, host, at } =
+    let
+        userNamePlaceholder =
+            span [ style [ ( "color", "transparent" ) ] ] [ text userName ]
+
+        atPlaceholder =
+            if at then
+                span [ style [ ( "color", "transparent" ) ] ] [ text "@" ]
+            else
+                span [ style [ ( "color", "gray" ) ] ] [ text "@" ]
+
+        hostColor =
+            if host == Email.initialHost then
+                "gray"
+            else
+                "transparent"
+
+        hostPlaceholder =
+            span [ style [ ( "color", hostColor ) ] ] [ text host ]
+    in
+        div []
+            [ userNamePlaceholder
+            , atPlaceholder
+            , hostPlaceholder
             ]
-    else
-        text ""
