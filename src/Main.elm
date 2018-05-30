@@ -11,6 +11,7 @@ type alias Model =
     { userName : String
     , host : String
     , emails : List String
+    , at : Bool
     }
 
 
@@ -27,6 +28,7 @@ initialModel =
     { userName = ""
     , host = Email.initialHost
     , emails = []
+    , at = False
     }
 
 
@@ -43,7 +45,7 @@ update msg model =
                 ( userName, host ) =
                     Email.splitAddress value
             in
-                ( { model | userName = userName, host = host }, Cmd.none )
+                ( { model | userName = userName, host = host, at = String.contains "@" value }, Cmd.none )
 
         GenerateMail ->
             let
@@ -128,6 +130,23 @@ mailForm model =
     Html.form
         [ onSubmit GenerateMail ]
         [ mailInput model
-        , span [] [ text model.host ]
+        , hostAddition model.host model.at
         , button [] [ text "Generate" ]
         ]
+
+
+hostAddition : String -> Bool -> Html Msg
+hostAddition host at =
+    if host == Email.initialHost then
+        span []
+            [ text
+                ((if at then
+                    ""
+                  else
+                    "@"
+                 )
+                    ++ host
+                )
+            ]
+    else
+        text ""
