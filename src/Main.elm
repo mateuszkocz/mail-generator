@@ -8,10 +8,8 @@ import Ports
 
 
 type alias Model =
-    { userName : String
-    , host : String
+    { value : String
     , emails : List String
-    , at : Bool
     }
 
 
@@ -25,10 +23,8 @@ type Msg
 
 initialModel : Model
 initialModel =
-    { userName = ""
-    , host = Email.initialHost
+    { value = ""
     , emails = []
-    , at = False
     }
 
 
@@ -41,16 +37,12 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Input value ->
-            let
-                ( userName, host ) =
-                    Email.splitAddress value
-            in
-                ( { model | userName = userName, host = host, at = String.contains "@" value }, Cmd.none )
+            ( { model | value = value }, Cmd.none )
 
         GenerateMail ->
             let
                 email =
-                    Email.generateEmail model.userName model.host model.emails
+                    Email.generateEmail model.value model.emails
             in
                 ( { model | emails = List.append model.emails [ email ] }, Ports.store email )
 
@@ -88,8 +80,8 @@ view model =
         ]
 
 
-mailInput : Model -> Html Msg
-mailInput model =
+mailInput : Html Msg
+mailInput =
     input
         [ placeholder "Mail address"
         , onInput Input
@@ -129,29 +121,35 @@ mailForm : Model -> Html Msg
 mailForm model =
     Html.form
         [ onSubmit GenerateMail ]
-        [ mailInput model
-        , hostAddition model
+        [ mailInput
+        , hostAddition model.value
         , button [] [ text "Generate" ]
         ]
 
 
-hostAddition : Model -> Html Msg
-hostAddition { userName, host, at } =
+hostAddition : String -> Html Msg
+hostAddition value =
     let
+        ( userName, host ) =
+            Email.splitAddress value
+
+        hostColor =
+            if host == Email.initialHost && not (String.contains Email.initialHost value) then
+                "gray"
+            else
+                "transparent"
+
+        atColor =
+            if String.contains "@" value then
+                "transparent"
+            else
+                "gray"
+
         userNamePlaceholder =
             span [ style [ ( "color", "transparent" ) ] ] [ text userName ]
 
         atPlaceholder =
-            if at then
-                span [ style [ ( "color", "transparent" ) ] ] [ text "@" ]
-            else
-                span [ style [ ( "color", "gray" ) ] ] [ text "@" ]
-
-        hostColor =
-            if host == Email.initialHost then
-                "gray"
-            else
-                "transparent"
+            span [ style [ ( "color", atColor ) ] ] [ text "@" ]
 
         hostPlaceholder =
             span [ style [ ( "color", hostColor ) ] ] [ text host ]

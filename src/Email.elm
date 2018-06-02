@@ -38,9 +38,12 @@ combineAddress userName host =
 -- - allow user to star numeration at defined point, eg. "asd+yolo+10" will start generating at 10
 
 
-generateEmail : String -> String -> List String -> String
-generateEmail userName host emails =
+generateEmail : String -> List String -> String
+generateEmail email emails =
     let
+        ( userName, host ) =
+            splitAddress email
+
         count =
             emails
                 |> List.filter (\address -> String.contains userName address && String.contains host address)
