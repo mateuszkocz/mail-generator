@@ -47,12 +47,12 @@ update msg model =
             in
                 ( { model | emails = List.append model.emails [ email ] }, Ports.store email )
 
-        GenerateAdditionalMail email ->
+        GenerateAdditionalMail baseEmail ->
             let
                 newEmail =
-                    Email.generateAdditionalEmail email model.emails
+                    Email.generateAdditionalEmail baseEmail model.emails
             in
-                ( { model | emails = List.append model.emails [ newEmail ] }, Ports.store email )
+                ( { model | emails = List.append model.emails [ newEmail ] }, Ports.store newEmail )
 
         ClearEmailsList ->
             ( { model | emails = [] }, Ports.removeAllEmails () )
