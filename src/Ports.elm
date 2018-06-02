@@ -1,13 +1,15 @@
 port module Ports exposing (..)
 
+import Email exposing (Email)
 
-port store : String -> Cmd msg
+
+port store : Email -> Cmd msg
 
 
 port getEmails : () -> Cmd msg
 
 
-port receiveEmails : (List String -> msg) -> Sub msg
+port receiveEmails : (List Email -> msg) -> Sub msg
 
 
 port removeEmail : String -> Cmd msg

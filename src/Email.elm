@@ -5,6 +5,15 @@ type alias AddressValues =
     ( String, String )
 
 
+type alias Email =
+    { id : String
+    , userName : String
+    , host : String
+    , count : Int
+    , note : String
+    }
+
+
 initialHost : String
 initialHost =
     "gmail.com"
@@ -33,12 +42,12 @@ combineAddress userName host =
 
 
 -- TODO
--- - when some address was removed, duplicates will be generated. Need to use the last value at least. It's still not perfect
+-- - when some address is removed, duplicates will be generated. Need to use the last value at least. It's still not perfect
 --   since the last value also might get removed. Maybe the future plan to store state in localstoage will help.
 -- - allow user to star numeration at defined point, eg. "asd+yolo+10" will start generating at 10
 
 
-generateEmail : String -> List String -> String
+generateEmail : String -> List Email -> Email
 generateEmail email emails =
     let
         ( userName, host ) =
@@ -46,8 +55,38 @@ generateEmail email emails =
 
         count =
             emails
-                |> List.filter (\address -> String.contains userName address && String.contains host address)
+                |> List.filter (\emailItem -> String.contains userName emailItem.userName && String.contains host emailItem.host)
                 |> List.length
                 |> (+) 1
+
+        id =
+            generateEmailId userName host count
     in
-        combineAddress (userName ++ "+" ++ (toString count)) host
+        { id = id
+        , userName = userName
+        , host = host
+        , count = count
+        , note = ""
+        }
+
+
+generateEmailId : String -> String -> Int -> String
+generateEmailId userName host count =
+    combineAddress (userName ++ "+" ++ (toString count)) host
+
+
+generateAdditionalEmail : Email -> List Email -> Email
+generateAdditionalEmail email emails =
+    let
+        count =
+            emails
+                |> List.filter (\emailItem -> emailItem.userName == email.userName && emailItem.host == email.host)
+                |> List.map .count
+                |> List.maximum
+                |> Maybe.withDefault 1
+                |> (+) 1
+    in
+        { email
+            | id = generateEmailId email.userName email.host count
+            , count = count
+        }

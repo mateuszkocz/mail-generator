@@ -9,16 +9,17 @@ import Ports
 
 type alias Model =
     { value : String
-    , emails : List String
+    , emails : List Email.Email
     }
 
 
 type Msg
     = Input String
-    | GenerateMail
+    | GenerateNewMail
+    | GenerateAdditionalMail Email.Email
     | ClearEmailsList
     | RemoveEmail String
-    | ReceivedEmails (List String)
+    | ReceivedEmails (List Email.Email)
 
 
 initialModel : Model
@@ -39,18 +40,25 @@ update msg model =
         Input value ->
             ( { model | value = value }, Cmd.none )
 
-        GenerateMail ->
+        GenerateNewMail ->
             let
                 email =
                     Email.generateEmail model.value model.emails
             in
                 ( { model | emails = List.append model.emails [ email ] }, Ports.store email )
 
+        GenerateAdditionalMail email ->
+            let
+                newEmail =
+                    Email.generateAdditionalEmail email model.emails
+            in
+                ( { model | emails = List.append model.emails [ newEmail ] }, Ports.store email )
+
         ClearEmailsList ->
             ( { model | emails = [] }, Ports.removeAllEmails () )
 
         RemoveEmail droppedEmail ->
-            ( { model | emails = List.filter (\email -> email /= droppedEmail) model.emails }, Ports.removeEmail droppedEmail )
+            ( { model | emails = List.filter (\email -> email.id /= droppedEmail) model.emails }, Ports.removeEmail droppedEmail )
 
         ReceivedEmails emails ->
             ( { model | emails = List.concat [ model.emails, emails ] }, Cmd.none )
@@ -89,7 +97,7 @@ mailInput =
         []
 
 
-mailsList : List String -> Html Msg
+mailsList : List Email.Email -> Html Msg
 mailsList emails =
     div []
         [ ul [] (List.reverse (mailItems emails))
@@ -100,7 +108,7 @@ mailsList emails =
         ]
 
 
-mailItems : List String -> List (Html Msg)
+mailItems : List Email.Email -> List (Html Msg)
 mailItems emails =
     List.map mailItem emails
 
@@ -109,18 +117,19 @@ mailItems emails =
 -- TODO: allow generating "another email like that", ie. generate with the same appendix like the clicked one with increased counter.
 
 
-mailItem : String -> Html Msg
+mailItem : Email.Email -> Html Msg
 mailItem email =
     li []
-        [ text email
-        , button [ onClick (RemoveEmail email) ] [ text "Remove" ]
+        [ text email.id
+        , button [ onClick (GenerateAdditionalMail email) ] [ text "New" ]
+        , button [ onClick (RemoveEmail email.id) ] [ text "Remove" ]
         ]
 
 
 mailForm : Model -> Html Msg
 mailForm model =
     Html.form
-        [ onSubmit GenerateMail ]
+        [ onSubmit GenerateNewMail ]
         [ mailInput
         , hostAddition model.value
         , button [] [ text "Generate" ]
