@@ -64,7 +64,7 @@ update msg model =
         SaveGeneratedEmail email date ->
             let
                 emailWithDate =
-                    { email | createdAt = Just (toString date) }
+                    { email | createdAt = toString date }
 
                 effect =
                     if model.autoClipboard then
@@ -147,6 +147,7 @@ mailItem : Email.Email -> Html Msg
 mailItem email =
     li []
         [ text email.id
+        , displayDate email.createdAt
         , button [ onClick (Copy email.id) ] [ text "Copy" ]
         , button [ onClick (GenerateAdditionalMail email) ] [ text "New" ]
         , button [ onClick (RemoveEmail email.id) ] [ text "Remove" ]
@@ -201,3 +202,21 @@ hostAddition value =
             , atPlaceholder
             , hostPlaceholder
             ]
+
+
+displayDate : String -> Html Msg
+displayDate date =
+    case Date.fromString date of
+        Ok d ->
+            let
+                dateContent =
+                    [ Date.day d, Date.hour d, Date.minute d ]
+                        |> List.map (\v -> toString v)
+                        |> String.join "_"
+            in
+                span
+                    [ style [ ( "margin", ("10px") ) ] ]
+                    [ text (toString (Date.month d) ++ "_" ++ dateContent) ]
+
+        Err err ->
+            text ""
