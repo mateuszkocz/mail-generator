@@ -10,6 +10,7 @@ import Ports
 type alias Model =
     { value : String
     , emails : List Email.Email
+    , autoClipboard : Bool
     }
 
 
@@ -20,12 +21,15 @@ type Msg
     | ClearEmailsList
     | RemoveEmail String
     | ReceivedEmails (List Email.Email)
+    | Copy String
+    | AutoClipboard Bool
 
 
 initialModel : Model
 initialModel =
     { value = ""
     , emails = []
+    , autoClipboard = True
     }
 
 
@@ -44,15 +48,27 @@ update msg model =
             let
                 email =
                     Email.generateEmail model.value model.emails
+
+                effect =
+                    if model.autoClipboard then
+                        Cmd.batch [ Ports.store email, Ports.copy email.id ]
+                    else
+                        Ports.store email
             in
-                ( { model | emails = List.append model.emails [ email ] }, Ports.store email )
+                ( { model | emails = List.append model.emails [ email ] }, effect )
 
         GenerateAdditionalMail baseEmail ->
             let
                 newEmail =
                     Email.generateAdditionalEmail baseEmail model.emails
+
+                effect =
+                    if model.autoClipboard then
+                        Cmd.batch [ Ports.store newEmail, Ports.copy newEmail.id ]
+                    else
+                        Ports.store newEmail
             in
-                ( { model | emails = List.append model.emails [ newEmail ] }, Ports.store newEmail )
+                ( { model | emails = List.append model.emails [ newEmail ] }, effect )
 
         ClearEmailsList ->
             ( { model | emails = [] }, Ports.removeAllEmails () )
@@ -62,6 +78,12 @@ update msg model =
 
         ReceivedEmails emails ->
             ( { model | emails = List.concat [ model.emails, emails ] }, Cmd.none )
+
+        Copy address ->
+            ( model, Ports.copy address )
+
+        AutoClipboard value ->
+            ( { model | autoClipboard = value }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -121,18 +143,25 @@ mailItem : Email.Email -> Html Msg
 mailItem email =
     li []
         [ text email.id
+        , button [ onClick (Copy email.id) ] [ text "Copy" ]
         , button [ onClick (GenerateAdditionalMail email) ] [ text "New" ]
         , button [ onClick (RemoveEmail email.id) ] [ text "Remove" ]
         ]
 
 
 mailForm : Model -> Html Msg
-mailForm model =
+mailForm { value, autoClipboard } =
     Html.form
         [ onSubmit GenerateNewMail ]
         [ mailInput
-        , hostAddition model.value
+        , hostAddition value
         , button [] [ text "Generate" ]
+        , input
+            [ onCheck AutoClipboard
+            , type_ "checkbox"
+            , checked autoClipboard
+            ]
+            [ text "Save to clipboard on generation" ]
         ]
 
 

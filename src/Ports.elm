@@ -16,3 +16,6 @@ port removeEmail : String -> Cmd msg
 
 
 port removeAllEmails : () -> Cmd msg
+
+
+port copy : String -> Cmd msg

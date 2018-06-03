@@ -2,8 +2,10 @@
 
 <body>
     <div></div>
+    <input type=text id=copy readonly>
     <script src="build/elm.js"></script>
     <script>
+        const copyContainer = document.getElementById('copy')
         const app = Elm.Main.embed(document.querySelector("div"))
         const {ports} = app
 
@@ -45,6 +47,13 @@
 
         ports.getEmails.subscribe(() => {
             ports.receiveEmails.send(getEmails())
+        })
+
+        ports.copy.subscribe(content => {
+            console.log('Copying', content)
+            copyContainer.value = content
+            copyContainer.select()
+            document.execCommand('copy')
         })
     </script>
 </body>
