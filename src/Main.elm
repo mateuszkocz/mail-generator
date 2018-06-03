@@ -5,6 +5,8 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Email
 import Ports
+import Date exposing (..)
+import Task exposing (..)
 
 
 type alias Model =
@@ -18,6 +20,7 @@ type Msg
     = Input String
     | GenerateNewMail
     | GenerateAdditionalMail Email.Email
+    | SaveGeneratedEmail Email.Email Date
     | ClearEmailsList
     | RemoveEmail String
     | ReceivedEmails (List Email.Email)
@@ -48,27 +51,28 @@ update msg model =
             let
                 email =
                     Email.generateEmail model.value model.emails
-
-                effect =
-                    if model.autoClipboard then
-                        Cmd.batch [ Ports.store email, Ports.copy email.id ]
-                    else
-                        Ports.store email
             in
-                ( { model | emails = List.append model.emails [ email ] }, effect )
+                ( model, Task.perform (SaveGeneratedEmail email) Date.now )
 
         GenerateAdditionalMail baseEmail ->
             let
-                newEmail =
+                email =
                     Email.generateAdditionalEmail baseEmail model.emails
+            in
+                ( model, Task.perform (SaveGeneratedEmail email) Date.now )
+
+        SaveGeneratedEmail email date ->
+            let
+                emailWithDate =
+                    { email | createdAt = Just (toString date) }
 
                 effect =
                     if model.autoClipboard then
-                        Cmd.batch [ Ports.store newEmail, Ports.copy newEmail.id ]
+                        Cmd.batch [ Ports.store emailWithDate, Ports.copy emailWithDate.id ]
                     else
-                        Ports.store newEmail
+                        Ports.store emailWithDate
             in
-                ( { model | emails = List.append model.emails [ newEmail ] }, effect )
+                ( { model | emails = List.append model.emails [ emailWithDate ] }, effect )
 
         ClearEmailsList ->
             ( { model | emails = [] }, Ports.removeAllEmails () )

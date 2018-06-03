@@ -1,5 +1,7 @@
 module Email exposing (..)
 
+import Date exposing (Date)
+
 
 type alias AddressValues =
     ( String, String )
@@ -11,6 +13,7 @@ type alias Email =
     , host : String
     , count : Int
     , note : String
+    , createdAt : Maybe String
     }
 
 
@@ -67,6 +70,7 @@ generateEmail email emails =
         , host = host
         , count = count
         , note = ""
+        , createdAt = Nothing
         }
 
 

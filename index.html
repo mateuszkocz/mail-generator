@@ -50,7 +50,6 @@
         })
 
         ports.copy.subscribe(content => {
-            console.log('Copying', content)
             copyContainer.value = content
             copyContainer.select()
             document.execCommand('copy')
