@@ -1,9 +1,13 @@
 port module Ports exposing (..)
 
-import Email exposing (Email)
+import Email exposing (Email, Id)
+import Notes exposing (Note)
 
 
-port store : Email -> Cmd msg
+port storeEmail : Email -> Cmd msg
+
+
+port storeNote : ( Id, Note ) -> Cmd msg
 
 
 port getEmails : () -> Cmd msg

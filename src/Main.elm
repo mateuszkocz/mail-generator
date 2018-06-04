@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Email
+import Notes exposing (Note, Notes)
 import Ports
 import Date exposing (..)
 import Task exposing (..)
@@ -16,14 +17,6 @@ type alias Model =
     , autoClipboard : Bool
     , notes : Notes
     }
-
-
-type alias Note =
-    String
-
-
-type alias Notes =
-    Dict String Note
 
 
 type Msg
@@ -80,9 +73,9 @@ update msg model =
 
                 effect =
                     if model.autoClipboard then
-                        Cmd.batch [ Ports.store emailWithDate, Ports.copy emailWithDate.id ]
+                        Cmd.batch [ Ports.storeEmail emailWithDate, Ports.copy emailWithDate.id ]
                     else
-                        Ports.store emailWithDate
+                        Ports.storeEmail emailWithDate
             in
                 ( { model | emails = List.append model.emails [ emailWithDate ] }, effect )
 
@@ -106,7 +99,7 @@ update msg model =
                 updatedNotes =
                     Dict.update emailId (\_ -> Just content) model.notes
             in
-                ( { model | notes = updatedNotes }, Cmd.none )
+                ( { model | notes = updatedNotes }, Ports.storeNote ( emailId, content ) )
 
 
 subscriptions : Model -> Sub Msg
@@ -156,10 +149,6 @@ mailsList emails notes =
 mailItems : List Email.Email -> Notes -> List (Html Msg)
 mailItems emails notes =
     List.map (\email -> mailItem email (Dict.get email.id notes)) emails
-
-
-
--- TODO: allow generating "another email like that", ie. generate with the same appendix like the clicked one with increased counter.
 
 
 mailItem : Email.Email -> Maybe Note -> Html Msg
