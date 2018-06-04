@@ -7,13 +7,23 @@ import Email
 import Ports
 import Date exposing (..)
 import Task exposing (..)
+import Dict exposing (..)
 
 
 type alias Model =
     { value : String
     , emails : List Email.Email
     , autoClipboard : Bool
+    , notes : Notes
     }
+
+
+type alias Note =
+    String
+
+
+type alias Notes =
+    Dict String Note
 
 
 type Msg
@@ -26,6 +36,7 @@ type Msg
     | ReceivedEmails (List Email.Email)
     | Copy String
     | AutoClipboard Bool
+    | UpdateNote Email.Id Note
 
 
 initialModel : Model
@@ -33,6 +44,7 @@ initialModel =
     { value = ""
     , emails = []
     , autoClipboard = True
+    , notes = Dict.empty
     }
 
 
@@ -89,6 +101,13 @@ update msg model =
         AutoClipboard value ->
             ( { model | autoClipboard = value }, Cmd.none )
 
+        UpdateNote emailId content ->
+            let
+                updatedNotes =
+                    Dict.update emailId (\_ -> Just content) model.notes
+            in
+                ( { model | notes = updatedNotes }, Cmd.none )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
@@ -110,7 +129,7 @@ view model =
     div []
         [ h1 [] [ text "Mail generator" ]
         , mailForm model
-        , mailsList model.emails
+        , mailsList model.emails model.notes
         ]
 
 
@@ -123,10 +142,10 @@ mailInput =
         []
 
 
-mailsList : List Email.Email -> Html Msg
-mailsList emails =
+mailsList : List Email.Email -> Notes -> Html Msg
+mailsList emails notes =
     div []
-        [ ul [] (List.reverse (mailItems emails))
+        [ ul [] (List.reverse (mailItems emails notes))
         , if List.isEmpty emails then
             text ""
           else
@@ -134,24 +153,48 @@ mailsList emails =
         ]
 
 
-mailItems : List Email.Email -> List (Html Msg)
-mailItems emails =
-    List.map mailItem emails
+mailItems : List Email.Email -> Notes -> List (Html Msg)
+mailItems emails notes =
+    List.map (\email -> mailItem email (Dict.get email.id notes)) emails
 
 
 
 -- TODO: allow generating "another email like that", ie. generate with the same appendix like the clicked one with increased counter.
 
 
-mailItem : Email.Email -> Html Msg
-mailItem email =
+mailItem : Email.Email -> Maybe Note -> Html Msg
+mailItem email note =
     li []
         [ text email.id
         , displayDate email.createdAt
         , button [ onClick (Copy email.id) ] [ text "Copy" ]
         , button [ onClick (GenerateAdditionalMail email) ] [ text "New" ]
         , button [ onClick (RemoveEmail email.id) ] [ text "Remove" ]
+        , noteView email.id note
         ]
+
+
+noteView : String -> Maybe Note -> Html Msg
+noteView id note =
+    let
+        noteContent =
+            case note of
+                Just v ->
+                    v
+
+                Nothing ->
+                    ""
+    in
+        div []
+            [ textarea
+                [ value noteContent
+                , onInput (UpdateNote id)
+                ]
+                []
+            , button
+                [ onClick (UpdateNote id "") ]
+                [ text "Clear" ]
+            ]
 
 
 mailForm : Model -> Html Msg

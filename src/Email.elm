@@ -5,12 +5,15 @@ type alias AddressValues =
     ( String, String )
 
 
+type alias Id =
+    String
+
+
 type alias Email =
-    { id : String
+    { id : Id
     , userName : String
     , host : String
     , count : Int
-    , note : String
     , createdAt : String
     }
 
@@ -67,7 +70,6 @@ generateEmail email emails =
         , userName = userName
         , host = host
         , count = count
-        , note = ""
         , createdAt = ""
         }
 
