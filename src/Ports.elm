@@ -35,7 +35,7 @@ port copy : String -> Cmd msg
 port storeSettings : Settings -> Cmd msg
 
 
-port receiveSettings : (Settings -> msg) -> Sub msg
+port receiveSettings : (Maybe Settings -> msg) -> Sub msg
 
 
 port getSettings : () -> Cmd msg

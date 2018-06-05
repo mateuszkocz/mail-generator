@@ -93,8 +93,7 @@
 
         ports.getSettings.subscribe(() => {
             const settings = JSON.parse(localStorage.getItem('settings'))
-            // FIXME: the default part is nasty. JS shouldn't know about the shape of this object.
-            ports.receiveSettings.send(settings || {autoClipboard: true})
+            ports.receiveSettings.send(settings)
         })
     </script>
 </body>

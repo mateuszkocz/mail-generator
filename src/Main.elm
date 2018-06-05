@@ -32,7 +32,7 @@ type Msg
     | Copy String
     | AutoClipboard Bool
     | UpdateNote Email.Id Note
-    | ReceivedSettings Settings
+    | ReceivedSettings (Maybe Settings)
 
 
 initialModel : Model
@@ -115,7 +115,12 @@ update msg model =
             ( { model | notes = Dict.fromList notes }, Cmd.none )
 
         ReceivedSettings settings ->
-            ( { model | settings = settings }, Cmd.none )
+            case settings of
+                Just s ->
+                    ( { model | settings = s }, Cmd.none )
+
+                Nothing ->
+                    ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
