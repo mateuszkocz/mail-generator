@@ -14,8 +14,13 @@ import Dict exposing (..)
 type alias Model =
     { value : String
     , emails : List Email.Email
-    , autoClipboard : Bool
     , notes : Notes
+    , settings : Settings
+    }
+
+
+type alias Settings =
+    { autoClipboard : Bool
     }
 
 
@@ -37,7 +42,7 @@ initialModel : Model
 initialModel =
     { value = ""
     , emails = []
-    , autoClipboard = True
+    , settings = { autoClipboard = True }
     , notes = Dict.empty
     }
 
@@ -73,7 +78,7 @@ update msg model =
                     { email | createdAt = toString date }
 
                 effect =
-                    if model.autoClipboard then
+                    if model.settings.autoClipboard then
                         Cmd.batch [ Ports.storeEmail emailWithDate, Ports.copy emailWithDate.id ]
                     else
                         Ports.storeEmail emailWithDate
@@ -93,7 +98,14 @@ update msg model =
             ( model, Ports.copy address )
 
         AutoClipboard value ->
-            ( { model | autoClipboard = value }, Cmd.none )
+            let
+                settings =
+                    model.settings
+
+                newSettings =
+                    { settings | autoClipboard = value }
+            in
+                ( { model | settings = newSettings }, Cmd.none )
 
         UpdateNote emailId content ->
             let
@@ -191,7 +203,7 @@ noteView id note =
 
 
 mailForm : Model -> Html Msg
-mailForm { value, autoClipboard } =
+mailForm { value, settings } =
     Html.form
         [ onSubmit GenerateNewMail ]
         [ mailInput
@@ -201,7 +213,7 @@ mailForm { value, autoClipboard } =
             [ input
                 [ onCheck AutoClipboard
                 , type_ "checkbox"
-                , checked autoClipboard
+                , checked autoClipboard.autoClipboard
                 ]
                 []
             , text "Save to clipboard"
