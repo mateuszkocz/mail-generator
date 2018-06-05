@@ -44,13 +44,6 @@ combineAddress userName host =
     userName ++ "@" ++ host
 
 
-
--- TODO
--- - when some address is removed, duplicates will be generated. Need to use the last value at least. It's still not perfect
---   since the last value also might get removed. Maybe the future plan to store state in localstoage will help.
--- - allow user to star numeration at defined point, eg. "asd+10" or "asd+yolo+10" will start generating at 10
-
-
 generateEmail : String -> List Email -> String -> Email
 generateEmail email emails baseDomain =
     let
