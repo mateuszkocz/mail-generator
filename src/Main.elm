@@ -197,12 +197,15 @@ mailForm { value, autoClipboard } =
         [ mailInput
         , hostAddition value
         , button [] [ text "Generate" ]
-        , input
-            [ onCheck AutoClipboard
-            , type_ "checkbox"
-            , checked autoClipboard
+        , label []
+            [ input
+                [ onCheck AutoClipboard
+                , type_ "checkbox"
+                , checked autoClipboard
+                ]
+                []
+            , text "Save to clipboard"
             ]
-            [ text "Save to clipboard on generation" ]
         ]
 
 
