@@ -2,7 +2,7 @@ port module Ports exposing (..)
 
 import Email exposing (Email, Id)
 import Notes exposing (Note)
-import Dict exposing (..)
+import Settings exposing (Settings)
 
 
 port storeEmail : Email -> Cmd msg
@@ -30,3 +30,12 @@ port removeAllEmails : () -> Cmd msg
 
 
 port copy : String -> Cmd msg
+
+
+port storeSettings : Settings -> Cmd msg
+
+
+port receiveSettings : (Settings -> msg) -> Sub msg
+
+
+port getSettings : () -> Cmd msg

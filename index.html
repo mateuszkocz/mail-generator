@@ -86,5 +86,15 @@
             forNotes(key => notes.push([rawNoteId(key), localStorage.getItem(key)]))
             ports.receiveNotes.send(notes)
         })
+
+        ports.storeSettings.subscribe(settings => {
+            localStorage.setItem('settings', JSON.stringify(settings))
+        })
+
+        ports.getSettings.subscribe(() => {
+            const settings = JSON.parse(localStorage.getItem('settings'))
+            // FIXME: the default part is nasty. JS shouldn't know about the shape of this object.
+            ports.receiveSettings.send(settings || {autoClipboard: true})
+        })
     </script>
 </body>

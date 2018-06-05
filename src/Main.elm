@@ -9,6 +9,7 @@ import Ports
 import Date exposing (..)
 import Task exposing (..)
 import Dict exposing (..)
+import Settings exposing (Settings)
 
 
 type alias Model =
@@ -16,11 +17,6 @@ type alias Model =
     , emails : List Email.Email
     , notes : Notes
     , settings : Settings
-    }
-
-
-type alias Settings =
-    { autoClipboard : Bool
     }
 
 
@@ -36,6 +32,7 @@ type Msg
     | Copy String
     | AutoClipboard Bool
     | UpdateNote Email.Id Note
+    | ReceivedSettings Settings
 
 
 initialModel : Model
@@ -49,7 +46,7 @@ initialModel =
 
 init : ( Model, Cmd Msg )
 init =
-    ( initialModel, Cmd.batch [ Ports.getEmails (), Ports.getNotes () ] )
+    ( initialModel, Cmd.batch [ Ports.getEmails (), Ports.getNotes (), Ports.getSettings () ] )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -105,7 +102,7 @@ update msg model =
                 newSettings =
                     { settings | autoClipboard = value }
             in
-                ( { model | settings = newSettings }, Cmd.none )
+                ( { model | settings = newSettings }, Ports.storeSettings newSettings )
 
         UpdateNote emailId content ->
             let
@@ -117,10 +114,13 @@ update msg model =
         ReceivedNotes notes ->
             ( { model | notes = Dict.fromList notes }, Cmd.none )
 
+        ReceivedSettings settings ->
+            ( { model | settings = settings }, Cmd.none )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.batch [ Ports.receiveEmails ReceivedEmails, Ports.receiveNotes ReceivedNotes ]
+    Sub.batch [ Ports.receiveEmails ReceivedEmails, Ports.receiveNotes ReceivedNotes, Ports.receiveSettings ReceivedSettings ]
 
 
 main : Program Never Model Msg
@@ -213,7 +213,7 @@ mailForm { value, settings } =
             [ input
                 [ onCheck AutoClipboard
                 , type_ "checkbox"
-                , checked autoClipboard.autoClipboard
+                , checked settings.autoClipboard
                 ]
                 []
             , text "Save to clipboard"
