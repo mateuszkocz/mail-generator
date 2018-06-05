@@ -27,6 +27,7 @@ type Msg
     | ClearEmailsList
     | RemoveEmail String
     | ReceivedEmails (List Email.Email)
+    | ReceivedNotes (List ( String, Note ))
     | Copy String
     | AutoClipboard Bool
     | UpdateNote Email.Id Note
@@ -43,7 +44,7 @@ initialModel =
 
 init : ( Model, Cmd Msg )
 init =
-    ( initialModel, Ports.getEmails () )
+    ( initialModel, Cmd.batch [ Ports.getEmails (), Ports.getNotes () ] )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -101,10 +102,13 @@ update msg model =
             in
                 ( { model | notes = updatedNotes }, Ports.storeNote ( emailId, content ) )
 
+        ReceivedNotes notes ->
+            ( { model | notes = Dict.fromList notes }, Cmd.none )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.batch [ Ports.receiveEmails ReceivedEmails ]
+    Sub.batch [ Ports.receiveEmails ReceivedEmails, Ports.receiveNotes ReceivedNotes ]
 
 
 main : Program Never Model Msg

@@ -8,6 +8,7 @@
         const copyContainer = document.getElementById('copy')
         const app = Elm.Main.embed(document.querySelector("div"))
         const {ports} = app
+        const notePrefix = 'note-'
 
         function getEmails() {
             try {
@@ -21,9 +22,26 @@
         function storeEmails(emails) {
             try {
                 localStorage.setItem('emails', JSON.stringify(emails))
-            } catch(error) {
+            } catch (error) {
                 console.log(error)
                 // TODO: Should inform Elm?
+            }
+        }
+
+        function noteId(emailId = '') {
+            return `${notePrefix}${emailId}`
+        }
+
+        function rawNoteId(id) {
+            return id.replace(notePrefix, '')
+        }
+
+        function forNotes(action) {
+            const baseNoteId = noteId()
+            for (const key of Object.keys(localStorage)) {
+                if (key.includes(baseNoteId)) {
+                    action(key)
+                }
             }
         }
 
@@ -31,18 +49,24 @@
             storeEmails([])
         }
 
-        ports.store.subscribe(email => {
+        ports.storeEmail.subscribe(email => {
             const emails = getEmails()
             emails.push(email)
             storeEmails(emails)
         })
 
-        ports.removeEmail.subscribe(droppedEmail => {
-            storeEmails(getEmails().filter(email => email !== droppedEmail))
+        ports.storeNote.subscribe(([emailId, content]) => {
+            localStorage.setItem(noteId(emailId), content)
+        })
+
+        ports.removeEmail.subscribe(emailId => {
+            storeEmails(getEmails().filter(({id}) => id !== emailId))
+            localStorage.removeItem(noteId(emailId))
         })
 
         ports.removeAllEmails.subscribe(() => {
             storeEmails([])
+            forNotes(key => localStorage.removeItem(key))
         })
 
         ports.getEmails.subscribe(() => {
@@ -53,6 +77,12 @@
             copyContainer.value = content
             copyContainer.select()
             document.execCommand('copy')
+        })
+
+        ports.getNotes.subscribe(() => {
+            const notes = []
+            forNotes(key => notes.push([rawNoteId(key), localStorage.getItem(key)]))
+            ports.receiveNotes.send(notes)
         })
     </script>
 </body>
