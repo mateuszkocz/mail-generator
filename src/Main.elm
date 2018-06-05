@@ -33,13 +33,17 @@ type Msg
     | AutoClipboard Bool
     | UpdateNote Email.Id Note
     | ReceivedSettings (Maybe Settings)
+    | SetBaseDomain String
 
 
 initialModel : Model
 initialModel =
     { value = ""
     , emails = []
-    , settings = { autoClipboard = True }
+    , settings =
+        { autoClipboard = True
+        , baseDomain = Email.initialHost
+        }
     , notes = Dict.empty
     }
 
@@ -58,7 +62,7 @@ update msg model =
         GenerateNewMail ->
             let
                 email =
-                    Email.generateEmail model.value model.emails
+                    Email.generateEmail model.value model.emails model.settings.baseDomain
             in
                 ( model, Task.perform (SaveGeneratedEmail email) Date.now )
 
@@ -122,6 +126,16 @@ update msg model =
                 Nothing ->
                     ( model, Cmd.none )
 
+        SetBaseDomain domain ->
+            let
+                settings =
+                    model.settings
+
+                newSettings =
+                    { settings | baseDomain = domain }
+            in
+                ( { model | settings = newSettings }, Ports.storeSettings newSettings )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
@@ -143,6 +157,7 @@ view model =
     div []
         [ h1 [] [ text "Mail generator" ]
         , mailForm model
+        , domainSaver model.value model.settings.baseDomain
         , mailsList model.emails model.notes
         ]
 
@@ -212,7 +227,7 @@ mailForm { value, settings } =
     Html.form
         [ onSubmit GenerateNewMail ]
         [ mailInput
-        , hostAddition value
+        , hostAddition value settings.baseDomain
         , button [] [ text "Generate" ]
         , label []
             [ input
@@ -226,14 +241,14 @@ mailForm { value, settings } =
         ]
 
 
-hostAddition : String -> Html Msg
-hostAddition value =
+hostAddition : String -> String -> Html Msg
+hostAddition value baseDomain =
     let
         ( userName, host ) =
-            Email.splitAddress value
+            Email.splitAddress value baseDomain
 
         hostColor =
-            if host == Email.initialHost && not (String.contains Email.initialHost value) then
+            if host == baseDomain && not (String.contains baseDomain value) then
                 "gray"
             else
                 "transparent"
@@ -276,3 +291,19 @@ displayDate date =
 
         Err err ->
             text ""
+
+
+domainSaver : String -> String -> Html Msg
+domainSaver value baseDomain =
+    let
+        ( _, host ) =
+            Email.splitAddress value baseDomain
+
+        textContent =
+            "Save " ++ host ++ " domain as a default."
+    in
+        button
+            [ disabled (host == baseDomain)
+            , onClick (SetBaseDomain host)
+            ]
+            [ text textContent ]
