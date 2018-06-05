@@ -74,9 +74,11 @@
         })
 
         ports.copy.subscribe(content => {
+            const currentActiveElement = document.activeElement
             copyContainer.value = content
             copyContainer.select()
             document.execCommand('copy')
+            currentActiveElement.focus()
         })
 
         ports.getNotes.subscribe(() => {
