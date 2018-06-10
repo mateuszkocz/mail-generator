@@ -3,35 +3,26 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Email
-import Notes exposing (Note, Notes)
+import Email as E
 import Ports
 import Date exposing (..)
 import Task exposing (..)
 import Dict exposing (..)
-import Settings exposing (Settings)
-
-
-type alias Model =
-    { value : String
-    , emails : List Email.Email
-    , notes : Notes
-    , settings : Settings
-    }
+import Types exposing (..)
 
 
 type Msg
     = Input String
     | GenerateNewMail
-    | GenerateAdditionalMail Email.Email
-    | SaveGeneratedEmail Email.Email Date
+    | GenerateAdditionalMail Email
+    | SaveGeneratedEmail Email Date
     | ClearEmailsList
     | RemoveEmail String
-    | ReceivedEmails (List Email.Email)
+    | ReceivedEmails (List Email)
     | ReceivedNotes (List ( String, Note ))
     | Copy String
     | AutoClipboard Bool
-    | UpdateNote Email.Id Note
+    | UpdateNote Id Note
     | ReceivedSettings (Maybe Settings)
     | SetBaseDomain String
 
@@ -42,7 +33,7 @@ initialModel =
     , emails = []
     , settings =
         { autoClipboard = True
-        , baseDomain = Email.initialHost
+        , baseDomain = E.initialHost
         }
     , notes = Dict.empty
     }
@@ -62,14 +53,14 @@ update msg model =
         GenerateNewMail ->
             let
                 email =
-                    Email.generateEmail model.value model.emails model.settings.baseDomain
+                    E.generateEmail model.value model.emails model.settings.baseDomain
             in
                 ( model, Task.perform (SaveGeneratedEmail email) Date.now )
 
         GenerateAdditionalMail baseEmail ->
             let
                 email =
-                    Email.generateAdditionalEmail baseEmail model.emails
+                    E.generateAdditionalEmail baseEmail model.emails
             in
                 ( model, Task.perform (SaveGeneratedEmail email) Date.now )
 
@@ -178,7 +169,7 @@ mailInput =
         []
 
 
-mailsList : List Email.Email -> Notes -> Html Msg
+mailsList : List Email -> Notes -> Html Msg
 mailsList emails notes =
     div []
         [ ul [] (List.reverse (mailItems emails notes))
@@ -189,12 +180,12 @@ mailsList emails notes =
         ]
 
 
-mailItems : List Email.Email -> Notes -> List (Html Msg)
+mailItems : List Email -> Notes -> List (Html Msg)
 mailItems emails notes =
     List.map (\email -> mailItem email (Dict.get email.id notes)) emails
 
 
-mailItem : Email.Email -> Maybe Note -> Html Msg
+mailItem : Email -> Maybe Note -> Html Msg
 mailItem email note =
     li []
         [ text email.id
@@ -254,7 +245,7 @@ hostAddition : String -> String -> Html Msg
 hostAddition value baseDomain =
     let
         ( userName, host ) =
-            Email.splitAddress value baseDomain
+            E.splitAddress value baseDomain
 
         hostColor =
             if host == baseDomain && not (String.contains baseDomain value) then
@@ -313,7 +304,7 @@ domainSaver : String -> String -> Html Msg
 domainSaver value baseDomain =
     let
         ( _, host ) =
-            Email.splitAddress value baseDomain
+            E.splitAddress value baseDomain
 
         textContent =
             "Save " ++ host ++ " domain as a default."

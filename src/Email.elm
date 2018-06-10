@@ -1,23 +1,7 @@
 module Email exposing (..)
 
 import Regex exposing (..)
-
-
-type alias AddressValues =
-    ( String, String )
-
-
-type alias Id =
-    String
-
-
-type alias Email =
-    { id : Id
-    , userName : String
-    , host : String
-    , count : Int
-    , createdAt : String
-    }
+import Types exposing (..)
 
 
 initialHost : String

@@ -1,8 +1,6 @@
 port module Ports exposing (..)
 
-import Email exposing (Email, Id)
-import Notes exposing (Note)
-import Settings exposing (Settings)
+import Types exposing (..)
 
 
 port storeEmail : Email -> Cmd msg
