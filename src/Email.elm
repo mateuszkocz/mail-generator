@@ -46,35 +46,53 @@ combineAddress userName host =
     userName ++ "@" ++ host
 
 
-extractCount : String -> ( String, Int )
+extractCount : String -> Int
 extractCount userName =
     userName
         |> String.split "+"
         |> List.drop 1
-        |> List.reverse
-        |> List.head
+        |> last
         |> Maybe.withDefault ""
         |> String.toInt
         |> Result.withDefault -1
         |> max 0
-        |> (,) (Regex.replace All (regex "\\+\\d+$") (always "") userName)
+
+
+last : List a -> Maybe a
+last list =
+    list
+        |> List.reverse
+        |> List.head
 
 
 generateEmail : String -> List Email -> String -> Email
 generateEmail email emails baseDomain =
     let
-        ( fulllUserName, host ) =
+        ( fullUserName, host ) =
             splitAddress email baseDomain
 
-        ( userName, startingCount ) =
-            extractCount fulllUserName
+        startingCount =
+            extractCount fullUserName
 
-        count =
+        userName =
+            Regex.replace All (regex "\\+\\d+$") (always "") fullUserName
+
+        previousEmail =
             emails
                 |> List.filter (\emailItem -> userName == emailItem.userName && String.contains host emailItem.host)
-                |> List.length
-                |> (+) 1
-                |> (+) startingCount
+                |> last
+
+        count =
+            case previousEmail of
+                Just email ->
+                    email
+                        |> .count
+                        |> (+) 1
+                        |> max startingCount
+
+                Nothing ->
+                    startingCount
+                        |> max 1
 
         id =
             generateEmailId userName host count
