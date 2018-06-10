@@ -1,6 +1,23 @@
 module Types exposing (..)
 
 import Dict exposing (Dict)
+import Date exposing (..)
+
+
+type Msg
+    = Input String
+    | GenerateNewMail
+    | GenerateAdditionalMail Email
+    | SaveGeneratedEmail Email Date
+    | ClearEmailsList
+    | RemoveEmail String
+    | ReceivedEmails (List Email)
+    | ReceivedNotes (List ( String, Note ))
+    | Copy String
+    | AutoClipboard Bool
+    | UpdateNote Id Note
+    | ReceivedSettings (Maybe Settings)
+    | SetBaseDomain String
 
 
 type alias Model =

@@ -11,22 +11,6 @@ import Dict exposing (..)
 import Types exposing (..)
 
 
-type Msg
-    = Input String
-    | GenerateNewMail
-    | GenerateAdditionalMail Email
-    | SaveGeneratedEmail Email Date
-    | ClearEmailsList
-    | RemoveEmail String
-    | ReceivedEmails (List Email)
-    | ReceivedNotes (List ( String, Note ))
-    | Copy String
-    | AutoClipboard Bool
-    | UpdateNote Id Note
-    | ReceivedSettings (Maybe Settings)
-    | SetBaseDomain String
-
-
 initialModel : Model
 initialModel =
     { value = ""
