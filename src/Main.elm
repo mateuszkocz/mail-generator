@@ -154,7 +154,7 @@ main =
 
 view : Model -> Html Msg
 view model =
-    div []
+    div [ style [ ( "font-size", "1.5rem" ), ( "font-family", "sans-serif" ) ] ]
         [ h1 [] [ text "Mail generator" ]
         , mailForm model
         , domainSaver model.value model.settings.baseDomain
@@ -165,8 +165,15 @@ view model =
 mailInput : Html Msg
 mailInput =
     input
-        [ placeholder "Mail address"
-        , onInput Input
+        [ onInput Input
+        , style
+            [ ( "border", "none" )
+            , ( "border-bottom", "1px solid gray" )
+            , ( "font-size", "inherit" )
+            , ( "padding", ".5rem" )
+            , ( "font-family", "inherit" )
+            , ( "width", "50%" )
+            ]
         ]
         []
 
@@ -225,7 +232,9 @@ noteView id note =
 mailForm : Model -> Html Msg
 mailForm { value, settings } =
     Html.form
-        [ onSubmit GenerateNewMail ]
+        [ onSubmit GenerateNewMail
+        , style [ ( "position", "relative" ) ]
+        ]
         [ mailInput
         , hostAddition value settings.baseDomain
         , button [] [ text "Generate" ]
@@ -268,7 +277,14 @@ hostAddition value baseDomain =
         hostPlaceholder =
             span [ style [ ( "color", hostColor ) ] ] [ text host ]
     in
-        div []
+        div
+            [ style
+                [ ( "position", "absolute" )
+                , ( "top", ".5rem" )
+                , ( "left", ".5rem" )
+                , ( "pointer-events", "none" )
+                ]
+            ]
             [ userNamePlaceholder
             , atPlaceholder
             , hostPlaceholder
