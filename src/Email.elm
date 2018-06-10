@@ -71,7 +71,7 @@ generateEmail email emails baseDomain =
 
         count =
             emails
-                |> List.filter (\emailItem -> String.contains userName emailItem.userName && String.contains host emailItem.host)
+                |> List.filter (\emailItem -> userName == emailItem.userName && String.contains host emailItem.host)
                 |> List.length
                 |> (+) 1
                 |> (+) startingCount
