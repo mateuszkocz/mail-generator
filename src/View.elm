@@ -21,9 +21,16 @@ mainView model =
         , actionSection model
         , div
             [ style
-                [ ( "padding", "0 1rem 1rem" ) ]
+                [ ( "padding", "0 1rem 1rem" )
+                , ( "max-width", "800px" )
+                , ( "margin", "1rem auto 0" )
+                ]
             ]
-            [ mailsList model.emails model.notes ]
+            [ if List.isEmpty model.emails then
+                manual
+              else
+                mailsList model.emails model.notes
+            ]
         ]
 
 
@@ -73,6 +80,28 @@ actionSection model =
                 []
             , text "Automatically save to clipboard"
             ]
+        ]
+
+
+manual : Html Msg
+manual =
+    div
+        [ style
+            [ ( "margin", "2rem" )
+            , ( "padding", "1rem" )
+            , ( "color", "gray" )
+            , ( "line-height", "1.5" )
+            ]
+        ]
+        [ p [ style [ ( "margin-top", "0" ) ] ] [ text """
+            Generate a bunch of email addresses—like my-account+10@gmail.com—for testing your app with different user accounts.
+            Add notes and easily manage the generated addresses to enhance your QA job. Works with
+            Gmail, custom domains and anything that can handle emails with "+" suffix.
+        """ ]
+        , p [] [ text """
+            Emails and notes are stored locally in your browser. You have full control of your data.
+        """ ]
+        , p [] [ text "Have fun!" ]
         ]
 
 
