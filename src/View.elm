@@ -110,7 +110,7 @@ mailsList emails notes =
             button
                 [ type_ "button"
                 , onClick ClearEmailsList
-                , style (withButtonStyles Primary [ ( "width", "100%" ) ])
+                , style (withButtonStyles Primary [])
                 ]
                 [ text "Remove all emails" ]
         ]
