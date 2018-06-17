@@ -350,7 +350,7 @@ displayDate date =
         Ok d ->
             let
                 hour =
-                    (toString (Date.hour d)) ++ ":" ++ (toString (Date.minute d))
+                    (String.padLeft 2 '0' (toString (Date.hour d))) ++ ":" ++ (String.padLeft 2 '0' (toString (Date.minute d)))
             in
                 span
                     [ style
