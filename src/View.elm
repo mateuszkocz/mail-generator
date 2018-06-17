@@ -11,12 +11,36 @@ import Date
 
 mainView : Model -> Html Msg
 mainView model =
-    div [ style [ ( "font-size", "1.5rem" ), ( "font-family", "sans-serif" ) ] ]
-        [ h1 [] [ text "Mail generator" ]
-        , mailForm model
-        , domainSaver model.value model.settings.baseDomain
-        , mailsList model.emails model.notes
+    div [ style [ ( "font-size", "1rem" ), ( "font-family", "sans-serif" ) ] ]
+        [ title
+        , div
+            [ style
+                [ ( "padding", "1rem" ) ]
+            ]
+            [ mailForm model
+            , domainSaver model.value model.settings.baseDomain
+            , mailsList model.emails model.notes
+            ]
         ]
+
+
+title : Html Msg
+title =
+    h1
+        [ style
+            [ ( "margin-top", "0" )
+            , ( "margin-bottom", "1rem" )
+            , ( "padding", "1rem" )
+            , ( "background", "hotpink" )
+            , ( "text-align", "center" )
+            , ( "color", "white" )
+            , ( "font-size", "1.1rem" )
+            , ( "font-weight", "400" )
+            , ( "text-transform", "uppercase" )
+            , ( "letter-spacing", ".1rem" )
+            ]
+        ]
+        [ text "Mail generator" ]
 
 
 mailInput : Html Msg
@@ -38,28 +62,63 @@ mailInput =
 mailsList : List Email -> Notes -> Html Msg
 mailsList emails notes =
     div []
-        [ ul [] (List.reverse (mailItems emails notes))
+        [ ul
+            [ style
+                [ ( "padding-left", "0" )
+                , ( "margin-top", "1rem" )
+                , ( "list-style", "none" )
+                ]
+            ]
+            (List.reverse (mailItems emails notes))
         , if List.isEmpty emails then
             text ""
           else
-            button [ type_ "button", onClick ClearEmailsList ] [ text "Clear" ]
+            button
+                [ type_ "button"
+                , onClick ClearEmailsList
+                , style [ ( "width", "100%" ) ]
+                ]
+                [ text "Remove all emails" ]
         ]
 
 
 mailItems : List Email -> Notes -> List (Html Msg)
 mailItems emails notes =
-    List.map (\email -> mailItem email (Dict.get email.id notes)) emails
+    List.indexedMap (\index email -> mailItem email (Dict.get email.id notes) index) emails
 
 
-mailItem : Email -> Maybe Note -> Html Msg
-mailItem email note =
-    li []
-        [ text email.id
-        , displayDate email.createdAt
-        , button [ onClick (Copy email.id) ] [ text "Copy" ]
-        , button [ onClick (GenerateAdditionalMail email) ] [ text "New" ]
-        , button [ onClick (RemoveEmail email.id) ] [ text "Remove" ]
+mailItem : Email -> Maybe Note -> Int -> Html Msg
+mailItem email note index =
+    li
+        [ style
+            [ ( "padding", "1rem 0" ) ]
+        ]
+        [ div
+            [ style
+                [ ( "display", "flex" )
+                , ( "justify-content", "space-between" )
+                , ( "width", "100%" )
+                ]
+            ]
+            [ span
+                [ style [ ( "color", "hotpink" ) ] ]
+                [ text email.id ]
+            , div
+                []
+                [ displayDate email.createdAt
+                , button [ onClick (Copy email.id) ] [ text "Copy to clipboard" ]
+                , button [ onClick (GenerateAdditionalMail email) ] [ text "New" ]
+                , button [ onClick (RemoveEmail email.id) ] [ text "Remove" ]
+                ]
+            ]
         , noteView email.id note
+        , div
+            [ style
+                [ ( "width", "10%" )
+                , ( "margin", "0 auto" )
+                ]
+            ]
+            []
         ]
 
 
@@ -74,15 +133,73 @@ noteView id note =
                 Nothing ->
                     ""
     in
-        div []
-            [ textarea
-                [ value noteContent
-                , onInput (UpdateNote id)
+        div
+            [ style
+                [ ( "display", "flex" )
+                , ( "flex-direction", "column" )
+                , ( "align-items", "flex-end" )
                 ]
-                []
+            ]
+            [ resizableTextArea id noteContent
             , button
                 [ onClick (UpdateNote id "") ]
                 [ text "Clear" ]
+            ]
+
+
+resizableTextArea : Id -> String -> Html Msg
+resizableTextArea id content =
+    let
+        -- This will make sure the last empty line will still be visible.
+        holderAppendix =
+            if (String.right 1 content) == "\n" || content == "" then
+                " "
+            else
+                ""
+
+        commonStyles =
+            [ ( "font-size", "70%" )
+            , ( "padding", ".2rem" )
+            , ( "line-height", "1" )
+            , ( "font-family", "sans-serif" )
+            ]
+    in
+        div
+            [ style
+                [ ( "position", "relative" )
+                , ( "width", "100%" )
+                , ( "margin", ".5rem 0" )
+                ]
+            ]
+            [ div
+                [ style
+                    (List.append
+                        [ ( "white-space", "pre" )
+                        , ( "border", "1px solid transparent" )
+                        ]
+                        commonStyles
+                    )
+                ]
+                [ text (content ++ holderAppendix) ]
+            , textarea
+                [ value content
+                , onInput (UpdateNote id)
+                , style
+                    (List.append
+                        [ ( "position", "absolute" )
+                        , ( "top", "0" )
+                        , ( "overflow", "hidden" )
+                        , ( "resize", "none" )
+                        , ( "width", "100%" )
+                        , ( "outline", "none" )
+                        , ( "height", "100%" )
+                        , ( "border", "1px solid whitesmoke" )
+                        ]
+                        commonStyles
+                    )
+                , placeholder "Add a note…"
+                ]
+                []
             ]
 
 
@@ -153,14 +270,17 @@ displayDate date =
     case Date.fromString date of
         Ok d ->
             let
-                dateContent =
-                    [ Date.day d, Date.hour d, Date.minute d ]
-                        |> List.map (\v -> toString v)
-                        |> String.join "_"
+                hour =
+                    (toString (Date.hour d)) ++ ":" ++ (toString (Date.minute d))
             in
                 span
-                    [ style [ ( "margin", ("10px") ) ] ]
-                    [ text (toString (Date.month d) ++ "_" ++ dateContent) ]
+                    [ style
+                        [ ( "font-size", "70%" )
+                        , ( "color", "gray" )
+                        , ( "margin-right", ".5rem" )
+                        ]
+                    ]
+                    [ text (toString (Date.month d) ++ " " ++ (toString (Date.day d)) ++ ", " ++ hour) ]
 
         Err err ->
             text ""
