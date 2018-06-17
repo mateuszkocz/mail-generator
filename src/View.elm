@@ -18,14 +18,12 @@ mainView : Model -> Html Msg
 mainView model =
     div [ style [ ( "font-size", "1rem" ), ( "font-family", "sans-serif" ) ] ]
         [ title
+        , actionSection model
         , div
             [ style
-                [ ( "padding", "1rem" ) ]
+                [ ( "padding", "0 1rem 1rem" ) ]
             ]
-            [ mailForm model
-            , domainSaver model.value model.settings.baseDomain
-            , mailsList model.emails model.notes
-            ]
+            [ mailsList model.emails model.notes ]
         ]
 
 
@@ -33,8 +31,7 @@ title : Html Msg
 title =
     h1
         [ style
-            [ ( "margin-top", "0" )
-            , ( "margin-bottom", "1rem" )
+            [ ( "margin", "0" )
             , ( "padding", "1rem" )
             , ( "background", "hotpink" )
             , ( "text-align", "center" )
@@ -48,17 +45,49 @@ title =
         [ text "Mail generator" ]
 
 
+actionSection : Model -> Html Msg
+actionSection model =
+    div
+        [ style
+            [ ( "display", "flex" )
+            , ( "padding-bottom", ".5rem" )
+            , ( "flex-direction", "column" )
+            , ( "justify-content", "center" )
+            , ( "align-items", "center" )
+            , ( "justify-content", "flex-end" )
+            , ( "height", "250px" )
+            , ( "border-bottom", "10px solid hotpink" )
+            ]
+        ]
+        [ mailForm model
+        , domainSaver model.value model.settings.baseDomain
+        , label
+            [ style
+                [ ( "font-size", "70%" ) ]
+            ]
+            [ input
+                [ onCheck AutoClipboard
+                , type_ "checkbox"
+                , checked model.settings.autoClipboard
+                ]
+                []
+            , text "Automatically save to clipboard"
+            ]
+        ]
+
+
 mailInput : Html Msg
 mailInput =
     input
         [ onInput Input
+        , autofocus True
         , style
             [ ( "border", "none" )
             , ( "border-bottom", "1px solid gray" )
             , ( "font-size", "inherit" )
             , ( "padding", ".5rem" )
             , ( "font-family", "inherit" )
-            , ( "width", "50%" )
+            , ( "width", "100%" )
             ]
         ]
         []
@@ -70,7 +99,7 @@ mailsList emails notes =
         [ ul
             [ style
                 [ ( "padding-left", "0" )
-                , ( "margin-top", "1rem" )
+                , ( "margin", "0" )
                 , ( "list-style", "none" )
                 ]
             ]
@@ -247,20 +276,30 @@ mailForm : Model -> Html Msg
 mailForm { value, settings } =
     Html.form
         [ onSubmit GenerateNewMail
-        , style [ ( "position", "relative" ) ]
-        ]
-        [ mailInput
-        , hostAddition value settings.baseDomain
-        , button [] [ text "Generate" ]
-        , label []
-            [ input
-                [ onCheck AutoClipboard
-                , type_ "checkbox"
-                , checked settings.autoClipboard
-                ]
-                []
-            , text "Save to clipboard"
+        , style
+            [ ( "position", "relative" )
+            , ( "display", "flex" )
+            , ( "align-items", "center" )
+            , ( "flex-direction", "column" )
+            , ( "margin-bottom", "3rem" )
             ]
+        ]
+        [ div
+            [ style
+                [ ( "width", "300px" )
+                , ( "margin-bottom", ".5rem" )
+                , ( "display", "flex" )
+                , ( "justify-content", "center" )
+                ]
+            ]
+            [ mailInput
+            , hostAddition value settings.baseDomain
+            ]
+        , button
+            [ style
+                (withButtonStyles Primary [ ( "flex-grow", "0" ), ( "font-size", "1rem" ) ])
+            ]
+            [ text "Generate" ]
         ]
 
 
@@ -338,5 +377,6 @@ domainSaver value baseDomain =
         button
             [ disabled (host == baseDomain)
             , onClick (SetBaseDomain host)
+            , style (withButtonStyles Secondary [])
             ]
             [ text textContent ]
