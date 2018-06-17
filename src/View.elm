@@ -9,6 +9,11 @@ import Email as E
 import Date
 
 
+type ButtonStyle
+    = Primary
+    | Secondary
+
+
 mainView : Model -> Html Msg
 mainView model =
     div [ style [ ( "font-size", "1rem" ), ( "font-family", "sans-serif" ) ] ]
@@ -76,7 +81,7 @@ mailsList emails notes =
             button
                 [ type_ "button"
                 , onClick ClearEmailsList
-                , style [ ( "width", "100%" ) ]
+                , style (withButtonStyles Primary [ ( "width", "100%" ) ])
                 ]
                 [ text "Remove all emails" ]
         ]
@@ -85,6 +90,26 @@ mailsList emails notes =
 mailItems : List Email -> Notes -> List (Html Msg)
 mailItems emails notes =
     List.indexedMap (\index email -> mailItem email (Dict.get email.id notes) index) emails
+
+
+withButtonStyles : ButtonStyle -> List ( String, String ) -> List ( String, String )
+withButtonStyles style styles =
+    let
+        borderColor =
+            case style of
+                Primary ->
+                    "hotpink"
+
+                Secondary ->
+                    "gray"
+    in
+        List.append
+            styles
+            [ ( "background", "none" )
+            , ( "border", "none" )
+            , ( "border-bottom", "2px solid" )
+            , ( "border-bottom-color", borderColor )
+            ]
 
 
 mailItem : Email -> Maybe Note -> Int -> Html Msg
@@ -106,9 +131,21 @@ mailItem email note index =
             , div
                 []
                 [ displayDate email.createdAt
-                , button [ onClick (Copy email.id) ] [ text "Copy to clipboard" ]
-                , button [ onClick (GenerateAdditionalMail email) ] [ text "New" ]
-                , button [ onClick (RemoveEmail email.id) ] [ text "Remove" ]
+                , button
+                    [ style (withButtonStyles Primary [ ( "margin", "0 .2rem" ) ])
+                    , onClick (Copy email.id)
+                    ]
+                    [ text "Copy to clipboard" ]
+                , button
+                    [ style (withButtonStyles Primary [ ( "margin", "0 .2rem" ) ])
+                    , onClick (GenerateAdditionalMail email)
+                    ]
+                    [ text "New" ]
+                , button
+                    [ style (withButtonStyles Primary [ ( "margin", "0 .2rem" ) ])
+                    , onClick (RemoveEmail email.id)
+                    ]
+                    [ text "Remove" ]
                 ]
             ]
         , noteView email.id note
@@ -142,8 +179,11 @@ noteView id note =
             ]
             [ resizableTextArea id noteContent
             , button
-                [ onClick (UpdateNote id "") ]
-                [ text "Clear" ]
+                [ onClick (UpdateNote id "")
+                , style (withButtonStyles Secondary [])
+                , disabled (noteContent == "")
+                ]
+                [ text "Clear the note" ]
             ]
 
 
