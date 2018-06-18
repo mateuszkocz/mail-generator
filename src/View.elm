@@ -254,7 +254,7 @@ mailItem email note index =
 noteView : String -> Maybe Note -> Html Msg
 noteView id note =
     let
-        noteContent =
+        content =
             case note of
                 Just v ->
                     v
@@ -269,11 +269,11 @@ noteView id note =
                 , ( "align-items", "flex-end" )
                 ]
             ]
-            [ resizableTextArea id noteContent
+            [ resizableTextArea id content
             , button
                 [ onClick (UpdateNote id "")
                 , style (withButtonStyles Secondary [])
-                , disabled (noteContent == "")
+                , disabled (content == "")
                 ]
                 [ text "Clear the note" ]
             ]
