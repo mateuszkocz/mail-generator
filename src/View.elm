@@ -28,19 +28,7 @@ mainView model =
         ]
         [ title
         , actionSection model
-        , div
-            [ style
-                [ ( "padding", "0 1rem 1rem" )
-                , ( "width", "100%" )
-                , ( "max-width", "800px" )
-                , ( "margin", "1rem auto 0" )
-                ]
-            ]
-            [ if List.isEmpty model.emails then
-                manual
-              else
-                mailsList model.emails model.notes
-            ]
+        , bodySection model
         ]
 
 
@@ -94,6 +82,23 @@ actionSection model =
                 []
             , text "Automatically save to clipboard"
             ]
+        ]
+
+
+bodySection : Model -> Html Msg
+bodySection model =
+    div
+        [ style
+            [ ( "padding", "0 1rem 1rem" )
+            , ( "width", "100%" )
+            , ( "max-width", "800px" )
+            , ( "margin", "1rem auto 0" )
+            ]
+        ]
+        [ if List.isEmpty model.emails then
+            manual
+          else
+            mailsList model.emails model.notes
         ]
 
 
