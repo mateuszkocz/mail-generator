@@ -111,17 +111,19 @@ manual =
         ]
         [ p [ style [ ( "margin-top", "0" ) ] ]
             [ text """
-            Generate and keep track of email addresses—like my-account+10@gmail.com—to test yopur app with different users accounts.
+            Generate and keep track of email addresses—like my-account+10@gmail.com—to test your app with different users accounts.
             Add notes and easily manage the generated addresses to enhance your QA job. Works with
-            Gmail, custom domains and anything that can handle a
+            Gmail, custom domains and anything that can handle a + suffix.
         """
-            , span [ style [ ( "color", "hotpink" ) ] ] [ text "+" ]
-            , text " suffix."
             ]
+        , p [] [ text """
+            You can start a counter from an arbitrary number by passing the number you want after the last + (eg. hello+10@gmail.com).
+            The last generated email is automatically saved in the clipboard and is ready to paste in your app.
+        """ ]
         , p [] [ text """
             Emails and notes are stored locally in your browser. You have full control of your data.
         """ ]
-        , p [ style [ ( "margin-bottom", "0" ) ] ] [ text "Have fun!" ]
+        , p [ style [ ( "margin-bottom", "0" ), ( "color", "hotpink" ) ] ] [ text "Have fun!" ]
         ]
 
 
@@ -206,7 +208,12 @@ mailItem email note index =
                 ]
             ]
             [ span
-                [ style [ ( "color", "hotpink" ) ] ]
+                [ style
+                    [ ( "color", "hotpink" )
+                    , ( "cursor", "pointer" )
+                    ]
+                , onClick (Copy email.id)
+                ]
                 [ text email.id ]
             , div
                 []
@@ -220,7 +227,7 @@ mailItem email note index =
                     [ style (withButtonStyles Primary [ ( "margin", "0 .2rem" ) ])
                     , onClick (GenerateAdditionalMail email)
                     ]
-                    [ text "New" ]
+                    [ text "New like this" ]
                 , button
                     [ style (withButtonStyles Primary [ ( "margin", "0 .2rem" ) ])
                     , onClick (RemoveEmail email.id)
