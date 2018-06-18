@@ -16,12 +16,22 @@ type ButtonStyle
 
 mainView : Model -> Html Msg
 mainView model =
-    div [ style [ ( "font-size", "1rem" ), ( "font-family", "sans-serif" ) ] ]
+    main_
+        [ style
+            [ ( "font-size", "1rem" )
+            , ( "font-family", "sans-serif" )
+            , ( "display", "flex" )
+            , ( "flex-direction", "column" )
+            , ( "align-items", "center" )
+            , ( "height", "100%" )
+            ]
+        ]
         [ title
         , actionSection model
         , div
             [ style
                 [ ( "padding", "0 1rem 1rem" )
+                , ( "width", "100%" )
                 , ( "max-width", "800px" )
                 , ( "margin", "1rem auto 0" )
                 ]
@@ -47,6 +57,8 @@ title =
             , ( "font-weight", "400" )
             , ( "text-transform", "uppercase" )
             , ( "letter-spacing", ".1rem" )
+            , ( "border-bottom", "7px solid pink" )
+            , ( "box-shadow", "0px 0px 7px rgba(0, 0, 0, 0.3)" )
             ]
         ]
         [ text "Mail generator" ]
@@ -63,14 +75,16 @@ actionSection model =
             , ( "align-items", "center" )
             , ( "justify-content", "flex-end" )
             , ( "height", "250px" )
-            , ( "border-bottom", "10px solid hotpink" )
+            , ( "border-bottom", "1px solid hotpink" )
             ]
         ]
         [ mailForm model
         , domainSaver model.value model.settings.baseDomain
         , label
             [ style
-                [ ( "font-size", "70%" ) ]
+                [ ( "font-size", "70%" )
+                , ( "margin-top", ".5rem" )
+                ]
             ]
             [ input
                 [ onCheck AutoClipboard
@@ -88,20 +102,26 @@ manual =
     div
         [ style
             [ ( "margin", "2rem" )
-            , ( "padding", "1rem" )
+            , ( "padding", "1.5rem 2rem" )
             , ( "color", "gray" )
-            , ( "line-height", "1.5" )
+            , ( "line-height", "2" )
+            , ( "font-size", "90%" )
+            , ( "background-color", "#eee" )
             ]
         ]
-        [ p [ style [ ( "margin-top", "0" ) ] ] [ text """
-            Generate a bunch of email addresses—like my-account+10@gmail.com—for testing your app with different user accounts.
+        [ p [ style [ ( "margin-top", "0" ) ] ]
+            [ text """
+            Generate and keep track of email addresses—like my-account+10@gmail.com—to test yopur app with different users accounts.
             Add notes and easily manage the generated addresses to enhance your QA job. Works with
-            Gmail, custom domains and anything that can handle emails with "+" suffix.
-        """ ]
+            Gmail, custom domains and anything that can handle a
+        """
+            , span [ style [ ( "color", "hotpink" ) ] ] [ text "+" ]
+            , text " suffix."
+            ]
         , p [] [ text """
             Emails and notes are stored locally in your browser. You have full control of your data.
         """ ]
-        , p [] [ text "Have fun!" ]
+        , p [ style [ ( "margin-bottom", "0" ) ] ] [ text "Have fun!" ]
         ]
 
 
@@ -117,6 +137,7 @@ mailInput =
             , ( "padding", ".5rem" )
             , ( "font-family", "inherit" )
             , ( "width", "100%" )
+            , ( "background", "transparent" )
             ]
         ]
         []
@@ -167,6 +188,7 @@ withButtonStyles style styles =
             , ( "border", "none" )
             , ( "border-bottom", "2px solid" )
             , ( "border-bottom-color", borderColor )
+            , ( "padding", ".3rem" )
             ]
 
 
@@ -256,26 +278,25 @@ resizableTextArea id content =
                 ""
 
         commonStyles =
-            [ ( "font-size", "70%" )
-            , ( "padding", ".2rem" )
-            , ( "line-height", "1" )
+            [ ( "font-size", "80%" )
+            , ( "padding", ".2rem .5rem" )
+            , ( "line-height", "1.3" )
             , ( "font-family", "sans-serif" )
+            , ( "border", "1px solid transparent" )
             ]
     in
         div
             [ style
                 [ ( "position", "relative" )
                 , ( "width", "100%" )
-                , ( "margin", ".5rem 0" )
+                , ( "margin", ".5rem -.5rem" )
                 ]
             ]
             [ div
                 [ style
                     (List.append
-                        [ ( "white-space", "pre" )
-                        , ( "border", "1px solid transparent" )
-                        ]
                         commonStyles
+                        [ ( "white-space", "pre" ) ]
                     )
                 ]
                 [ text (content ++ holderAppendix) ]
@@ -284,6 +305,7 @@ resizableTextArea id content =
                 , onInput (UpdateNote id)
                 , style
                     (List.append
+                        commonStyles
                         [ ( "position", "absolute" )
                         , ( "top", "0" )
                         , ( "overflow", "hidden" )
@@ -291,9 +313,10 @@ resizableTextArea id content =
                         , ( "width", "100%" )
                         , ( "outline", "none" )
                         , ( "height", "100%" )
-                        , ( "border", "1px solid whitesmoke" )
+                        , ( "border-left", "1px solid grey" )
+                        , ( "background", "transparent" )
+                        , ( "color", "#222" )
                         ]
-                        commonStyles
                     )
                 , placeholder "Add a note…"
                 ]
@@ -315,8 +338,9 @@ mailForm { value, settings } =
         ]
         [ div
             [ style
-                [ ( "width", "300px" )
-                , ( "margin-bottom", ".5rem" )
+                [ ( "margin-bottom", "1rem" )
+                , ( "width", "300px" )
+                , ( "margin-bottom", "1rem" )
                 , ( "display", "flex" )
                 , ( "justify-content", "center" )
                 ]
