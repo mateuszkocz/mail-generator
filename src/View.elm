@@ -26,53 +26,46 @@ mainView model =
             , ( "height", "100%" )
             ]
         ]
-        [ title
-        , actionSection model
+        [ top model
         , bodySection model
         ]
 
 
-title : Html Msg
-title =
-    h1
+top : Model -> Html Msg
+top model =
+    header
         [ style
-            [ ( "margin", "0" )
-            , ( "padding", "1rem" )
-            , ( "background", "hotpink" )
-            , ( "text-align", "center" )
-            , ( "color", "white" )
-            , ( "font-size", "1.1rem" )
-            , ( "font-weight", "400" )
-            , ( "text-transform", "uppercase" )
-            , ( "letter-spacing", ".1rem" )
-            , ( "border-bottom", "7px solid pink" )
-            , ( "box-shadow", "0px 0px 7px rgba(0, 0, 0, 0.3)" )
+            [ ( "width", "100%" )
+            , ( "display", "flex" )
+            , ( "justify-content", "space-between" )
+            , ( "align-items", "center" )
+            , ( "border-bottom", "1px solid hotpink" )
+            , ( "padding", ".5rem 1rem" )
             ]
         ]
-        [ text "Mail generator" ]
+        [ h1
+            [ style
+                [ ( "display", "inline-block" )
+                , ( "font-size", "1.1rem" )
+                , ( "font-weight", "400" )
+                , ( "text-transform", "uppercase" )
+                , ( "letter-spacing", ".1rem" )
+                ]
+            ]
+            [ text "Mail generator" ]
+        , mailForm model
+        , actionSection model
+        ]
 
 
 actionSection : Model -> Html Msg
 actionSection model =
     div
-        [ style
-            [ ( "display", "flex" )
-            , ( "padding-bottom", ".5rem" )
-            , ( "flex-direction", "column" )
-            , ( "justify-content", "center" )
-            , ( "align-items", "center" )
-            , ( "justify-content", "flex-end" )
-            , ( "height", "250px" )
-            , ( "border-bottom", "1px solid hotpink" )
-            ]
-        ]
-        [ mailForm model
-        , domainSaver model.value model.settings.baseDomain
+        []
+        [ domainSaver model.value model.settings.baseDomain
         , label
             [ style
-                [ ( "font-size", "70%" )
-                , ( "margin-top", ".5rem" )
-                ]
+                [ ( "font-size", "70%" ), ( "margin-left", "5px" ) ]
             ]
             [ input
                 [ onCheck AutoClipboard
@@ -80,7 +73,7 @@ actionSection model =
                 , checked model.settings.autoClipboard
                 ]
                 []
-            , text "Automatically save to clipboard"
+            , text "Copy to clipboard"
             ]
         ]
 
@@ -193,9 +186,10 @@ withButtonStyles style styles =
             styles
             [ ( "background", "none" )
             , ( "border", "none" )
-            , ( "border-bottom", "2px solid" )
+            , ( "border-bottom", "1px solid" )
             , ( "border-bottom-color", borderColor )
             , ( "padding", ".3rem" )
+            , ( "cursor", "pointer" )
             ]
 
 
@@ -343,28 +337,19 @@ mailForm { value, settings } =
         , style
             [ ( "position", "relative" )
             , ( "display", "flex" )
-            , ( "align-items", "center" )
-            , ( "flex-direction", "column" )
-            , ( "margin-bottom", "3rem" )
+            , ( "width", "300px" )
             ]
         ]
         [ div
-            [ style
-                [ ( "margin-bottom", "1rem" )
-                , ( "width", "300px" )
-                , ( "margin-bottom", "1rem" )
-                , ( "display", "flex" )
-                , ( "justify-content", "center" )
-                ]
-            ]
+            [ style [ ( "width", "100%" ) ] ]
             [ mailInput
             , hostAddition value settings.baseDomain
             ]
         , button
             [ style
-                (withButtonStyles Primary [ ( "flex-grow", "0" ), ( "font-size", "1rem" ) ])
+                (withButtonStyles Primary [ ( "font-size", "1rem" ) ])
             ]
-            [ text "Generate" ]
+            [ text "→" ]
         ]
 
 
@@ -437,7 +422,7 @@ domainSaver value baseDomain =
             E.splitAddress value baseDomain
 
         textContent =
-            "Save " ++ host ++ " domain as a default."
+            "Save domain"
     in
         button
             [ disabled (host == baseDomain)
