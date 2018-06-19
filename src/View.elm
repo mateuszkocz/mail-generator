@@ -315,7 +315,7 @@ resizableTextArea id content =
             [ style
                 [ ( "position", "relative" )
                 , ( "width", "100%" )
-                , ( "margin", ".5rem -.5rem 0" )
+                , ( "margin-top", ".5rem" )
                 ]
             ]
             [ div
