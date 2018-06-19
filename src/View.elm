@@ -28,6 +28,7 @@ mainView model =
         ]
         [ top model
         , bodySection model
+        , bottom
         ]
 
 
@@ -452,3 +453,22 @@ domainSaver value baseDomain =
             , style (withButtonStyles Secondary [ ( "color", "#fff" ), ( "border-bottom-color", "currentcolor" ) ])
             ]
             [ text textContent ]
+
+
+bottom : Html Msg
+bottom =
+    footer
+        [ style
+            [ ( "text-align", "center" )
+            , ( "color", "#bbb" )
+            , ( "font-size", "90%" )
+            ]
+        ]
+        [ p [] [ text "★" ]
+        , p [ style [ ( "padding-left", "6px" ) ] ]
+            [ text "made by "
+            , a [ style [ ( "color", "inherit" ) ], href "https://github.com/mateuszkocz" ] [ text "MK" ]
+            , text " — src @ "
+            , a [ style [ ( "color", "inherit" ) ], href "https://github.com/mateuszkocz/TODO" ] [ text "GitHub" ]
+            ]
+        ]
