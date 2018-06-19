@@ -105,6 +105,8 @@ manual =
             , ( "line-height", "2" )
             , ( "font-size", "90%" )
             , ( "background-color", "#eee" )
+            , ( "box-shadow", "0 6px 8px rgba(102,119,136,.03), 0 1px 2px rgba(102,119,136,.3)" )
+            , ( "border-radius", "2px" )
             ]
         ]
         [ p [ style [ ( "margin-top", "0" ) ] ]
@@ -197,7 +199,12 @@ mailItem : Email -> Maybe Note -> Int -> Html Msg
 mailItem email note index =
     li
         [ style
-            [ ( "padding", "1rem 0" ) ]
+            [ ( "padding", "1rem" )
+            , ( "background", "#fff" )
+            , ( "box-shadow", "0 6px 8px rgba(102,119,136,.03), 0 1px 2px rgba(102,119,136,.3)" )
+            , ( "border-radius", "2px" )
+            , ( "margin-bottom", "1rem" )
+            ]
         ]
         [ div
             [ style
@@ -319,9 +326,9 @@ resizableTextArea id content =
                         , ( "width", "100%" )
                         , ( "outline", "none" )
                         , ( "height", "100%" )
-                        , ( "border-left", "1px solid grey" )
+                        , ( "border-left", "1px solid #ddd" )
                         , ( "background", "transparent" )
-                        , ( "color", "#222" )
+                        , ( "color", "#555" )
                         ]
                     )
                 , placeholder "Add a note…"
