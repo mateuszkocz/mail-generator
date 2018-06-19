@@ -109,3 +109,8 @@ generateAdditionalEmail email emails =
             | id = generateEmailId email.userName email.host count
             , count = count
         }
+
+
+empty : Email -> Bool
+empty email =
+    email.userName == ""

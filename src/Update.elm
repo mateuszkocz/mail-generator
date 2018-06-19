@@ -1,7 +1,7 @@
 module Update exposing (..)
 
 import Types exposing (..)
-import Email as E
+import Email
 import Task
 import Ports
 import Date
@@ -17,14 +17,17 @@ update msg model =
         GenerateNewMail ->
             let
                 email =
-                    E.generateEmail model.value model.emails model.settings.baseDomain
+                    Email.generateEmail model.value model.emails model.settings.baseDomain
             in
-                ( model, Task.perform (SaveGeneratedEmail email) Date.now )
+                if Email.empty email then
+                    ( model, Cmd.none )
+                else
+                    ( model, Task.perform (SaveGeneratedEmail email) Date.now )
 
         GenerateAdditionalMail baseEmail ->
             let
                 email =
-                    E.generateAdditionalEmail baseEmail model.emails
+                    Email.generateAdditionalEmail baseEmail model.emails
             in
                 ( model, Task.perform (SaveGeneratedEmail email) Date.now )
 
