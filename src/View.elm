@@ -314,14 +314,14 @@ resizableTextArea id content =
             [ style
                 [ ( "position", "relative" )
                 , ( "width", "100%" )
-                , ( "margin", ".5rem -.5rem" )
+                , ( "margin", ".5rem -.5rem 0" )
                 ]
             ]
             [ div
                 [ style
                     (List.append
                         commonStyles
-                        [ ( "white-space", "pre" ) ]
+                        [ ( "white-space", "pre-wrap" ) ]
                     )
                 ]
                 [ text (content ++ holderAppendix) ]
@@ -339,7 +339,7 @@ resizableTextArea id content =
                         , ( "outline", "none" )
                         , ( "height", "100%" )
                         , ( "border-left", "1px solid #ddd" )
-                        , ( "background", "transparent" )
+                        , ( "background", "#fff" )
                         , ( "color", "#555" )
                         ]
                     )
