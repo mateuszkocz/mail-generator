@@ -41,6 +41,9 @@ top model =
             , ( "align-items", "center" )
             , ( "border-bottom", "1px solid hotpink" )
             , ( "padding", ".5rem 1rem" )
+            , ( "background", "hotpink" )
+            , ( "color", "white" )
+            , ( "box-shadow", "0 6px 8px rgba(102,119,136,.03), 0 1px 2px rgba(102,119,136,.3)" )
             ]
         ]
         [ h1
@@ -61,11 +64,18 @@ top model =
 actionSection : Model -> Html Msg
 actionSection model =
     div
-        []
+        [ style
+            [ ( "display", "flex" )
+            , ( "align-items", "center" )
+            , ( "justify-content", "right" )
+            ]
+        ]
         [ domainSaver model.value model.settings.baseDomain
         , label
             [ style
-                [ ( "font-size", "70%" ), ( "margin-left", "5px" ) ]
+                [ ( "font-size", "70%" )
+                , ( "margin-left", "5px" )
+                ]
             ]
             [ input
                 [ onCheck AutoClipboard
@@ -101,23 +111,23 @@ manual =
         [ style
             [ ( "margin", "2rem" )
             , ( "padding", "1.5rem 2rem" )
-            , ( "color", "gray" )
+            , ( "color", "#555" )
             , ( "line-height", "2" )
             , ( "font-size", "90%" )
-            , ( "background-color", "#eee" )
+            , ( "background-color", "#f5f5f5" )
             , ( "box-shadow", "0 6px 8px rgba(102,119,136,.03), 0 1px 2px rgba(102,119,136,.3)" )
             , ( "border-radius", "2px" )
             ]
         ]
         [ p [ style [ ( "margin-top", "0" ) ] ]
             [ text """
-            Generate and keep track of email addresses—like my-account+10@gmail.com—to test your app with different users accounts.
-            Add notes and easily manage the generated addresses to enhance your QA job. Works with
+            Generate and keep track of email addresses you're using to test your app with different users accounts.
+            Add notes and easily manage the generated emails to make your QA job easy. Works with
             Gmail, custom domains and anything that can handle a + suffix.
         """
             ]
         , p [] [ text """
-            You can start a counter from an arbitrary number by passing the number you want after the last + (eg. hello+10@gmail.com).
+            You can start the counter from an arbitrary number by passing the number you want after the last + (eg. hello+10@gmail.com).
             The last generated email is automatically saved in the clipboard and is ready to paste in your app.
         """ ]
         , p [] [ text """
@@ -134,12 +144,14 @@ mailInput =
         , autofocus True
         , style
             [ ( "border", "none" )
-            , ( "border-bottom", "1px solid gray" )
             , ( "font-size", "inherit" )
             , ( "padding", ".5rem" )
             , ( "font-family", "inherit" )
             , ( "width", "100%" )
-            , ( "background", "transparent" )
+            , ( "background", "white" )
+            , ( "border-radius", "2px" )
+            , ( "color", "#555" )
+            , ( "box-shadow", "0 6px 8px rgba(102,119,136,.03), 0 1px 2px rgba(102,119,136,.3)" )
             ]
         ]
         []
@@ -354,7 +366,7 @@ mailForm { value, settings } =
             ]
         , button
             [ style
-                (withButtonStyles Primary [ ( "font-size", "1rem" ) ])
+                (withButtonStyles Primary [ ( "font-size", "1rem" ), ( "color", "#fff" ) ])
             ]
             [ text "→" ]
         ]
@@ -366,9 +378,12 @@ hostAddition value baseDomain =
         ( userName, host ) =
             E.splitAddress value baseDomain
 
+        baseColor =
+            "#bbb"
+
         hostColor =
             if host == baseDomain && not (String.contains baseDomain value) then
-                "gray"
+                baseColor
             else
                 "transparent"
 
@@ -376,7 +391,7 @@ hostAddition value baseDomain =
             if String.contains "@" value then
                 "transparent"
             else
-                "gray"
+                baseColor
 
         userNamePlaceholder =
             span [ style [ ( "color", "transparent" ) ] ] [ text userName ]
@@ -434,6 +449,6 @@ domainSaver value baseDomain =
         button
             [ disabled (host == baseDomain)
             , onClick (SetBaseDomain host)
-            , style (withButtonStyles Secondary [])
+            , style (withButtonStyles Secondary [ ( "color", "#fff" ), ( "border-bottom-color", "currentcolor" ) ])
             ]
             [ text textContent ]
