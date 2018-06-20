@@ -1,12 +1,12 @@
-module Main exposing (..)
+module Main exposing (main)
 
-import Html exposing (..)
+import Html
 import Ports
-import Dict exposing (..)
-import Types exposing (..)
+import Dict
+import Types exposing (Model, Msg(..))
 import Update
 import View
-import Email as E
+import Email
 
 
 initialModel : Model
@@ -15,7 +15,7 @@ initialModel =
     , emails = []
     , settings =
         { autoClipboard = True
-        , baseDomain = E.initialHost
+        , baseDomain = Email.initialHost
         }
     , notes = Dict.empty
     }
@@ -27,7 +27,7 @@ init =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.batch [ Ports.receiveEmails ReceivedEmails, Ports.receiveNotes ReceivedNotes, Ports.receiveSettings ReceivedSettings ]
 
 

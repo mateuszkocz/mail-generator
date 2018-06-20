@@ -1,10 +1,10 @@
-module View exposing (..)
+module View exposing (mainView)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
-import Types exposing (..)
-import Dict exposing (Dict)
+import Html exposing (Html, main_, p, div, footer, header, h1, text, label, input, ul, li, button, span, textarea, a)
+import Html.Attributes exposing (style, placeholder, type_, checked, autofocus, disabled, value, href)
+import Html.Events exposing (onClick, onCheck, onSubmit, onInput)
+import Types exposing (Msg(..), Model, Email, Notes, Note, Id)
+import Dict
 import Email as E
 import Date
 
@@ -187,10 +187,10 @@ mailItems emails notes =
 
 
 withButtonStyles : ButtonStyle -> List ( String, String ) -> List ( String, String )
-withButtonStyles style styles =
+withButtonStyles buttonStyle styles =
     let
         borderColor =
-            case style of
+            case buttonStyle of
                 Primary ->
                     "hotpink"
 
@@ -209,7 +209,7 @@ withButtonStyles style styles =
 
 
 mailItem : Email -> Maybe Note -> Int -> Html Msg
-mailItem email note index =
+mailItem email note _ =
     li
         [ style
             [ ( "padding", "1rem" )
@@ -298,7 +298,7 @@ resizableTextArea id content =
     let
         -- This will make sure the last empty line will still be visible.
         holderAppendix =
-            if (String.right 1 content) == "\n" || content == "" then
+            if String.right 1 content == "\n" || content == "" then
                 " "
             else
                 ""
@@ -351,7 +351,7 @@ resizableTextArea id content =
 
 
 mailForm : Model -> Html Msg
-mailForm { value, settings } =
+mailForm model =
     Html.form
         [ onSubmit GenerateNewMail
         , style
@@ -363,7 +363,7 @@ mailForm { value, settings } =
         [ div
             [ style [ ( "width", "100%" ) ] ]
             [ mailInput
-            , hostAddition value settings.baseDomain
+            , hostAddition model.value model.settings.baseDomain
             ]
         , button
             [ style
@@ -374,22 +374,22 @@ mailForm { value, settings } =
 
 
 hostAddition : String -> String -> Html Msg
-hostAddition value baseDomain =
+hostAddition email baseDomain =
     let
         ( userName, host ) =
-            E.splitAddress value baseDomain
+            E.splitAddress email baseDomain
 
         baseColor =
             "#bbb"
 
         hostColor =
-            if host == baseDomain && not (String.contains baseDomain value) then
+            if host == baseDomain && not (String.contains baseDomain email) then
                 baseColor
             else
                 "transparent"
 
         atColor =
-            if String.contains "@" value then
+            if String.contains "@" email then
                 "transparent"
             else
                 baseColor
@@ -423,7 +423,7 @@ displayDate date =
         Ok d ->
             let
                 hour =
-                    (String.padLeft 2 '0' (toString (Date.hour d))) ++ ":" ++ (String.padLeft 2 '0' (toString (Date.minute d)))
+                    String.padLeft 2 '0' (toString (Date.hour d)) ++ ":" ++ String.padLeft 2 '0' (toString (Date.minute d))
             in
                 span
                     [ style
@@ -432,17 +432,17 @@ displayDate date =
                         , ( "margin-right", ".5rem" )
                         ]
                     ]
-                    [ text (toString (Date.month d) ++ " " ++ (toString (Date.day d)) ++ ", " ++ hour) ]
+                    [ text (toString (Date.month d) ++ " " ++ toString (Date.day d) ++ ", " ++ hour) ]
 
-        Err err ->
+        Err _ ->
             text ""
 
 
 domainSaver : String -> String -> Html Msg
-domainSaver value baseDomain =
+domainSaver email baseDomain =
     let
         ( _, host ) =
-            E.splitAddress value baseDomain
+            E.splitAddress email baseDomain
 
         textContent =
             "Save domain"

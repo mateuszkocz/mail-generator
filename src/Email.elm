@@ -1,12 +1,17 @@
-module Email exposing (..)
+module Email exposing (initialHost, generateEmail, generateAdditionalEmail, splitAddress, empty)
 
-import Regex exposing (..)
-import Types exposing (..)
+import Regex exposing (Regex)
+import Types exposing (Email, AddressValues)
 
 
 initialHost : String
 initialHost =
     "gmail.com"
+
+
+digitRegex : Regex
+digitRegex =
+    Regex.regex "\\+\\d+$"
 
 
 splitAddress : String -> String -> AddressValues
@@ -59,7 +64,7 @@ generateEmail email emails baseDomain =
             extractCount fullUserName
 
         userName =
-            Regex.replace All (regex "\\+\\d+$") (always "") fullUserName
+            Regex.replace Regex.All digitRegex (always "") fullUserName
 
         previousEmail =
             emails
@@ -68,8 +73,8 @@ generateEmail email emails baseDomain =
 
         count =
             case previousEmail of
-                Just email ->
-                    email
+                Just address ->
+                    address
                         |> .count
                         |> (+) 1
                         |> max startingCount
@@ -91,7 +96,7 @@ generateEmail email emails baseDomain =
 
 generateEmailId : String -> String -> Int -> String
 generateEmailId userName host count =
-    combineAddress (userName ++ "+" ++ (toString count)) host
+    combineAddress (userName ++ "+" ++ toString count) host
 
 
 generateAdditionalEmail : Email -> List Email -> Email

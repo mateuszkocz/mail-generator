@@ -1,6 +1,6 @@
 port module Ports exposing (..)
 
-import Types exposing (..)
+import Types exposing (Email, Id, Note, Settings)
 
 
 port storeEmail : Email -> Cmd msg

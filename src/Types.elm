@@ -1,14 +1,14 @@
 module Types exposing (..)
 
-import Dict exposing (Dict)
-import Date exposing (..)
+import Dict
+import Date
 
 
 type Msg
     = Input String
     | GenerateNewMail
     | GenerateAdditionalMail Email
-    | SaveGeneratedEmail Email Date
+    | SaveGeneratedEmail Email Date.Date
     | ClearEmailsList
     | RemoveEmail String
     | ReceivedEmails (List Email)
@@ -50,7 +50,7 @@ type alias Note =
 
 
 type alias Notes =
-    Dict String Note
+    Dict.Dict String Note
 
 
 type alias Settings =

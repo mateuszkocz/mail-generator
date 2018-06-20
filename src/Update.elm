@@ -1,11 +1,11 @@
-module Update exposing (..)
+module Update exposing (update)
 
-import Types exposing (..)
+import Types exposing (Model, Msg(..))
 import Email
 import Task
 import Ports
 import Date
-import Dict exposing (Dict)
+import Dict
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
