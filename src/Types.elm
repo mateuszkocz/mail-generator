@@ -11,7 +11,7 @@ type Msg
     | SaveGeneratedEmail Email Date.Date
     | ClearEmailsList
     | RemoveEmail String
-    | Copy String
+    | CopyToClipboard Id
     | AutoClipboard Bool
     | SetBaseDomain String
     | UpdateNote Id Note

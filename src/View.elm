@@ -231,7 +231,7 @@ mailItem email note _ =
                     [ ( "color", "hotpink" )
                     , ( "cursor", "pointer" )
                     ]
-                , onClick (Copy email.id)
+                , onClick (CopyToClipboard email.id)
                 ]
                 [ text email.id ]
             , div
@@ -239,7 +239,7 @@ mailItem email note _ =
                 [ displayDate email.createdAt
                 , button
                     [ style (withButtonStyles Primary [ ( "margin", "0 .2rem" ) ])
-                    , onClick (Copy email.id)
+                    , onClick (CopyToClipboard email.id)
                     ]
                     [ text "Copy to clipboard" ]
                 , button

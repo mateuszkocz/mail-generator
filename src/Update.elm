@@ -42,7 +42,7 @@ update msg model =
                     else
                         Ports.storeEmail emailWithDate
             in
-                ( { model | emails = List.append model.emails [ emailWithDate ] }, effect )
+                ( { model | emails = model.emails ++ [ emailWithDate ] }, effect )
 
         ClearEmailsList ->
             ( { model | emails = [] }, Ports.removeAllEmails () )
@@ -51,9 +51,9 @@ update msg model =
             ( { model | emails = List.filter (\email -> email.id /= droppedEmail) model.emails }, Ports.removeEmail droppedEmail )
 
         ReceiveEmails emails ->
-            ( { model | emails = List.concat [ model.emails, emails ] }, Cmd.none )
+            ( { model | emails = model.emails ++ emails }, Cmd.none )
 
-        Copy address ->
+        CopyToClipboard address ->
             ( model, Ports.copy address )
 
         AutoClipboard value ->
