@@ -9,6 +9,19 @@ import Email as E
 import Date
 
 
+colors : { primary : String, secondary : String, background : String }
+colors =
+    { primary = "hotpink"
+    , secondary = "#555"
+    , background = "#f5f5f5"
+    }
+
+
+boxShadow : String
+boxShadow =
+    "0 6px 8px rgba(102,119,136,.03), 0 1px 2px rgba(102,119,136,.3)"
+
+
 type ButtonStyle
     = Primary
     | Secondary
@@ -40,11 +53,11 @@ top model =
             , ( "display", "flex" )
             , ( "justify-content", "space-between" )
             , ( "align-items", "center" )
-            , ( "border-bottom", "1px solid hotpink" )
+            , ( "border-bottom", "1px solid " ++ colors.primary )
             , ( "padding", ".5rem 1rem" )
-            , ( "background", "hotpink" )
+            , ( "background", colors.primary )
             , ( "color", "white" )
-            , ( "box-shadow", "0 6px 8px rgba(102,119,136,.03), 0 1px 2px rgba(102,119,136,.3)" )
+            , ( "box-shadow", boxShadow )
             ]
         ]
         [ h1
@@ -112,11 +125,11 @@ manual =
         [ style
             [ ( "margin", "2rem" )
             , ( "padding", "1.5rem 2rem" )
-            , ( "color", "#555" )
+            , ( "color", colors.secondary )
             , ( "line-height", "2" )
             , ( "font-size", "90%" )
-            , ( "background-color", "#f5f5f5" )
-            , ( "box-shadow", "0 6px 8px rgba(102,119,136,.03), 0 1px 2px rgba(102,119,136,.3)" )
+            , ( "background-color", colors.background )
+            , ( "box-shadow", boxShadow )
             , ( "border-radius", "2px" )
             ]
         ]
@@ -134,7 +147,7 @@ manual =
         , p [] [ text """
             Emails and notes are stored locally in your browser. You have full control of your data.
         """ ]
-        , p [ style [ ( "margin-bottom", "0" ), ( "color", "hotpink" ) ] ] [ text "Have fun!" ]
+        , p [ style [ ( "margin-bottom", "0" ), ( "color", colors.primary ) ] ] [ text "Have fun!" ]
         ]
 
 
@@ -151,8 +164,8 @@ mailInput =
             , ( "width", "100%" )
             , ( "background", "white" )
             , ( "border-radius", "2px" )
-            , ( "color", "#555" )
-            , ( "box-shadow", "0 6px 8px rgba(102,119,136,.03), 0 1px 2px rgba(102,119,136,.3)" )
+            , ( "color", colors.secondary )
+            , ( "box-shadow", boxShadow )
             ]
         ]
         []
@@ -192,7 +205,7 @@ withButtonStyles buttonStyle styles =
         borderColor =
             case buttonStyle of
                 Primary ->
-                    "hotpink"
+                    colors.primary
 
                 Secondary ->
                     "gray"
@@ -214,7 +227,7 @@ mailItem email note _ =
         [ style
             [ ( "padding", "1rem" )
             , ( "background", "#fff" )
-            , ( "box-shadow", "0 6px 8px rgba(102,119,136,.03), 0 1px 2px rgba(102,119,136,.3)" )
+            , ( "box-shadow", boxShadow )
             , ( "border-radius", "2px" )
             , ( "margin-bottom", "1rem" )
             ]
@@ -228,7 +241,7 @@ mailItem email note _ =
             ]
             [ span
                 [ style
-                    [ ( "color", "hotpink" )
+                    [ ( "color", colors.primary )
                     , ( "cursor", "pointer" )
                     ]
                 , onClick (CopyToClipboard email.id)
@@ -269,12 +282,7 @@ noteView : String -> Maybe Note -> Html Msg
 noteView id note =
     let
         content =
-            case note of
-                Just v ->
-                    v
-
-                Nothing ->
-                    ""
+            Maybe.withDefault "" note
     in
         div
             [ style
@@ -293,7 +301,7 @@ noteView id note =
             ]
 
 
-resizableTextArea : Id -> String -> Html Msg
+resizableTextArea : Id -> Note -> Html Msg
 resizableTextArea id content =
     let
         -- This will make sure the last empty line will still be visible.
@@ -341,7 +349,7 @@ resizableTextArea id content =
                         , ( "height", "100%" )
                         , ( "border-left", "1px solid #ddd" )
                         , ( "background", "#fff" )
-                        , ( "color", "#555" )
+                        , ( "color", colors.secondary )
                         ]
                     )
                 , placeholder "Add a note…"
@@ -443,16 +451,13 @@ domainSaver email baseDomain =
     let
         ( _, host ) =
             E.splitAddress email baseDomain
-
-        textContent =
-            "Save domain"
     in
         button
             [ disabled (host == baseDomain)
             , onClick (SetBaseDomain host)
             , style (withButtonStyles Secondary [ ( "color", "#fff" ), ( "border-bottom-color", "currentcolor" ) ])
             ]
-            [ text textContent ]
+            [ text "Save domain" ]
 
 
 bottom : Html Msg
