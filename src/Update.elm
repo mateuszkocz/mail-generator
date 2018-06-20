@@ -50,7 +50,7 @@ update msg model =
         RemoveEmail droppedEmail ->
             ( { model | emails = List.filter (\email -> email.id /= droppedEmail) model.emails }, Ports.removeEmail droppedEmail )
 
-        ReceivedEmails emails ->
+        ReceiveEmails emails ->
             ( { model | emails = List.concat [ model.emails, emails ] }, Cmd.none )
 
         Copy address ->
@@ -73,10 +73,10 @@ update msg model =
             in
                 ( { model | notes = updatedNotes }, Ports.storeNote ( emailId, content ) )
 
-        ReceivedNotes notes ->
+        ReceiveNotes notes ->
             ( { model | notes = Dict.fromList notes }, Cmd.none )
 
-        ReceivedSettings settings ->
+        ReceiveSettings settings ->
             case settings of
                 Just s ->
                     ( { model | settings = s }, Cmd.none )

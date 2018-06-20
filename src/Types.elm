@@ -11,13 +11,13 @@ type Msg
     | SaveGeneratedEmail Email Date.Date
     | ClearEmailsList
     | RemoveEmail String
-    | ReceivedEmails (List Email)
-    | ReceivedNotes (List ( String, Note ))
     | Copy String
     | AutoClipboard Bool
-    | UpdateNote Id Note
-    | ReceivedSettings (Maybe Settings)
     | SetBaseDomain String
+    | UpdateNote Id Note
+    | ReceiveSettings (Maybe Settings)
+    | ReceiveEmails (List Email)
+    | ReceiveNotes (List ( String, Note ))
 
 
 type alias Model =

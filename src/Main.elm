@@ -28,7 +28,7 @@ init =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.batch [ Ports.receiveEmails ReceivedEmails, Ports.receiveNotes ReceivedNotes, Ports.receiveSettings ReceivedSettings ]
+    Sub.batch [ Ports.receiveEmails ReceiveEmails, Ports.receiveNotes ReceiveNotes, Ports.receiveSettings ReceiveSettings ]
 
 
 main : Program Never Model Msg
