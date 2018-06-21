@@ -474,6 +474,6 @@ bottom =
             [ text "made by "
             , a [ style [ ( "color", "inherit" ) ], href "https://github.com/mateuszkocz" ] [ text "MK" ]
             , text " — src @ "
-            , a [ style [ ( "color", "inherit" ) ], href "http://mateuszkocz.github.io/mail-generator" ] [ text "GitHub" ]
+            , a [ style [ ( "color", "inherit" ) ], href "https://github.com/mateuszkocz/mail-generator" ] [ text "GitHub" ]
             ]
         ]
