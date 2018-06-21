@@ -4,6 +4,7 @@
 cp src/index.html index.html
 sed -i .bk 's/\.temp\/app\.js/dist\/app\.js/g' index.html
 sed -i .bk 's/ports\.js/dist\/ports\.js/g' index.html
+sed -i .bk '2s/^/<!-- Production file. Do not modify manually. -->\'$'\n/' index.html
 rm *.bk
 
 # Build the app.
