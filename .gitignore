@@ -16,4 +16,4 @@ node_modules
 # VS Code stuff
 .vscode
 
-build
+src/.temp

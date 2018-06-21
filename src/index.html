@@ -1,0 +1,37 @@
+<!doctype html>
+<head>
+    <style>
+        * {
+            box-sizing: border-box
+        }
+
+        html, body, #app {
+            margin: 0;
+            min-height: 100%;
+        }
+
+        body {
+            background: #fafafa
+        }
+
+        #copy {
+            position: absolute !important;
+            clip: rect(1px, 1px, 1px, 1px);
+            padding:0 !important;
+            border: 0 !important;
+            height: 1px !important;
+            width: 1px !important;
+            overflow: hidden;
+        }
+
+        ::-webkit-input-placeholder {color: #bbb;}
+        ::-moz-placeholder {color: #bbb;}
+        :-ms-input-placeholder {color: #bbb; }
+    </style>
+</head>
+<body>
+    <div id=app></div>
+    <input type=text id=copy readonly>
+    <script src=".temp/app.js"></script>
+    <script src="ports.js"></script>
+</body>
